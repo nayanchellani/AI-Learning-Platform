@@ -1,0 +1,11 @@
+express 
+mongoose 
+cors 
+cookie-parser 
+helmet 
+express-rate-limit 
+dotenv 
+jsonwebtoken 
+bcryptjs 
+axios 
+@google/generative-ai
