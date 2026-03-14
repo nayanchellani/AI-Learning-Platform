@@ -58,7 +58,6 @@ export const getTrendingVideos = async (maxResults = 10) => {
                 part: "snippet,statistics,contentDetails",
                 chart: "mostPopular",
                 maxResults,
-                regionCode: "IN",
                 key: API_KEY
             }
         });
@@ -75,7 +74,6 @@ export const getTrendingVideos = async (maxResults = 10) => {
         }));
     } catch (error) {
         console.error("YouTube Trending Error:", error.response?.data || error.message);
-        const detail = error.response?.data?.error?.message || error.message;
-        throw new Error(`YouTube API Error: ${detail}`);
+        throw new Error("Failed to fetch trending videos");
     }
 };
