@@ -1,4 +1,5 @@
 import React from 'react';
+import './YtTutorial.css';
 
 const YtTutorial = () => {
   return (
