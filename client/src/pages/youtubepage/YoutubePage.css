@@ -234,27 +234,45 @@
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
   border: none;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  transition: color 0.35s ease;
+}
+
+.btn-watch::before, .btn-quiz::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  z-index: -1;
+  border-radius: 12px;
+  transition: width 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.btn-watch:hover::before, .btn-quiz:hover::before {
+  width: 100%;
 }
 
 .btn-watch {
-  background-color: rgba(255,255,255,0.06);
-  color: var(--text-primary);
+  background-color: #f1f5f9;
+  color: #1e293b;
 }
 
-.btn-watch:hover {
-  background-color: rgba(255,255,255,0.12);
+.btn-watch::before {
+  background-color: #cbd5e1;
 }
 
 .btn-quiz {
-  background-color: rgba(255, 192, 0, 0.1);
-  color: var(--accent-gold);
-}
-
-.btn-quiz:hover {
   background-color: var(--accent-gold);
   color: #121212;
+}
+
+.btn-quiz::before {
+  background-color: #e5ad00;
 }
 
 /* Skeletons */

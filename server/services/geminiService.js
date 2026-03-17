@@ -1,7 +1,17 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+let genAI = null;
+let model = null;
+
+const getModel = () => {
+    if (!model) {
+        const apiKey = process.env.GEMINI_API_KEY;
+        console.log("[Gemini] Initializing with API key:", apiKey ? `${apiKey.substring(0, 10)}...` : "MISSING!");
+        genAI = new GoogleGenerativeAI(apiKey);
+        model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    }
+    return model;
+};
 
 export const generateQuiz = async (topic, difficulty) => {
     try {
@@ -13,7 +23,7 @@ export const generateQuiz = async (topic, difficulty) => {
         - correctAnswer: (number 0-3)
         - explanation: (string)`;
 
-        const result = await model.generateContent(prompt);
+        const result = await getModel().generateContent(prompt);
         const response = await result.response;
         const text = response.text();
 
@@ -38,7 +48,7 @@ export const reviewCode = async (code, language) => {
         - issues: (array of strings)
         - rating: (number 0-10)`;
 
-        const result = await model.generateContent(prompt);
+        const result = await getModel().generateContent(prompt);
         const response = await result.response;
         const text = response.text();
 
@@ -68,7 +78,7 @@ export const generateRoadmap = async (title, category, skillLevel) => {
           - difficulty: (string)
           - dependencies: (array of strings, ids of previous nodes)`;
 
-        const result = await model.generateContent(prompt);
+        const result = await getModel().generateContent(prompt);
         const response = await result.response;
         const text = response.text();
 

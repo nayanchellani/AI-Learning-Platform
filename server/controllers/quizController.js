@@ -47,13 +47,16 @@ export const submitQuiz = async (req, res) => {
 
         let score = 0;
         const results = quiz.questions.map((q, index) => {
-            const isCorrect = q.answer === answers[index];
+            const correctOptionIndex = q.correctAnswer;
+            const correctOptionText = q.options[correctOptionIndex];
+            const userAnswer = answers[index];
+            const isCorrect = userAnswer === correctOptionText;
             if (isCorrect) score++;
             return {
                 question: q.question,
                 isCorrect,
-                correctAnswer: q.answer,
-                userAnswer: answers[index],
+                correctAnswer: correctOptionText,
+                userAnswer,
                 explanation: q.explanation
             };
         });
