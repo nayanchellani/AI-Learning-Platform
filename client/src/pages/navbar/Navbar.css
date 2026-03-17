@@ -141,6 +141,10 @@
   background-color: rgba(255, 255, 255, 0.06);
 }
 
-.dropdown-logout:hover {
+.dropdown-logout {
   color: var(--error);
+}
+
+.dropdown-logout:hover {
+  background-color: rgba(239, 68, 68, 0.1);
 }

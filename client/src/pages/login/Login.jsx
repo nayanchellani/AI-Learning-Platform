@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import { customToast } from '../../utils/toastUtils';
 import './Login.css';
 
 const Login = () => {
@@ -14,10 +14,10 @@ const Login = () => {
     e.preventDefault();
     try {
       await login(email, password);
-      toast.success("Welcome back!");
+      customToast.success("Welcome back!");
       navigate('/dashboard');
     } catch (err) {
-      toast.error(err.response?.data?.message || "Login failed");
+      customToast.error(err.response?.data?.message || "Login failed");
     }
   };
 

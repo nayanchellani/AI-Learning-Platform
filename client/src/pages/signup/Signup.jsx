@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import { customToast } from '../../utils/toastUtils';
 import './Signup.css';
 
 const Signup = () => {
@@ -15,10 +15,10 @@ const Signup = () => {
     e.preventDefault();
     try {
       await signup({ username, email, password });
-      toast.success("Account created!");
+      customToast.success("Account created!");
       navigate('/login');
     } catch (err) {
-      toast.error(err.response?.data?.message || "Signup failed");
+      customToast.error(err.response?.data?.message || "Signup failed");
     }
   };
 
