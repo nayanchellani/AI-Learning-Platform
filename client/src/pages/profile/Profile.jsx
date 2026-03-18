@@ -11,6 +11,11 @@ const Profile = () => {
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Edit Profile State
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({ username: '', bio: '', skillLevel: 'beginner' });
+  const [isSaving, setIsSaving] = useState(false);
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -27,13 +32,39 @@ const Profile = () => {
   }, []);
 
   const handleUpdatePicture = () => {
-    toast("Picture upload map pending backend support");
+    toast("Picture upload mapping pending comprehensive backend AWS S3 support.");
   };
 
   const handleLogout = async () => {
     toast.success("Logged out successfully");
     await logout();
     navigate('/login', { replace: true });
+  };
+
+  const openEditModal = () => {
+    const data = profileData || user || {};
+    setEditForm({
+      username: data.username || '',
+      bio: data.bio || '',
+      skillLevel: data.skillLevel || 'beginner'
+    });
+    setIsEditing(true);
+  };
+
+  const handleSaveProfile = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      const response = await axios.put('/api/auth/profile', editForm);
+      setProfileData(response.data);
+      toast.success("Profile updated successfully!");
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      toast.error(error.response?.data?.message || "Failed to update profile");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (loading) {
@@ -47,7 +78,7 @@ const Profile = () => {
   const data = profileData || user || {};
   const progress = data.progress || {};
   
-  // 1. Header Stats
+  // 1. Header Stats & Levels
   const videosWatched = progress.videosWatched || [];
   const quizzesCompleted = progress.quizzesCompleted || [];
   
@@ -59,30 +90,88 @@ const Profile = () => {
     avgScore = Math.round(totalPercentage / quizzesCompleted.length);
   }
 
+  // Calculate Level (Every 5 activities = 1 level)
+  const totalActivity = quizzesCompleted.length + videosWatched.length;
+  const level = Math.floor(totalActivity / 5) + 1;
+  const userSkill = data.skillLevel ? data.skillLevel.charAt(0).toUpperCase() + data.skillLevel.slice(1) : "Beginner";
+
   // 2. Learning Progress
   const currentStreak = progress.streak?.current || 0;
-  const totalActivity = quizzesCompleted.length + videosWatched.length;
-  // Let's say every milestone is 10 activities for the progress bar
-  const journeyProgress = totalActivity === 0 ? 0 : Math.min(100, Math.round((totalActivity % 10) * 10));
+  // Let's assume a milestone is every 5 activities
+  const journeyProgress = totalActivity === 0 ? 0 : Math.min(100, Math.round(((totalActivity % 5) / 5) * 100));
   
-  // 3. Recent Activity (Last 3 videos)
-  const recentVideos = [...videosWatched]
-    .sort((a, b) => new Date(b.watchedAt) - new Date(a.watchedAt))
-    .slice(0, 3);
+  // 3. Recent Activity (Unique Videos, Last 3)
+  const uniqueVideos = [];
+  const seenVideoIds = new Set();
+  const sortedVideos = [...videosWatched].sort((a, b) => new Date(b.watchedAt) - new Date(a.watchedAt));
+  
+  for (const vid of sortedVideos) {
+    if (!seenVideoIds.has(vid.videoId)) {
+      uniqueVideos.push(vid);
+      seenVideoIds.add(vid.videoId);
+    }
+  }
+  const recentVideos = uniqueVideos.slice(0, 3);
 
   // 4. Quiz Performance (Last 3 quizzes)
   const recentQuizzes = [...quizzesCompleted]
     .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))
     .slice(0, 3);
 
-  // 5. Recommended Next Step
-  // If they watched a video recently but didn't take a quiz -> recommend quiz
-  // Otherwise -> Next video in path
-
   return (
     <div className="profile-page">
       <div className="profile-container">
         
+        {/* Edit Profile Modal */}
+        {isEditing && (
+          <div className="edit-modal-overlay">
+            <div className="edit-modal">
+              <div className="edit-modal-header">
+                <h2>Edit Profile</h2>
+                <button className="close-modal-btn" onClick={() => setIsEditing(false)}>×</button>
+              </div>
+              <form onSubmit={handleSaveProfile} className="edit-modal-form">
+                <div className="form-group">
+                  <label>Username</label>
+                  <input 
+                    type="text" 
+                    value={editForm.username} 
+                    onChange={(e) => setEditForm({...editForm, username: e.target.value})}
+                    required
+                    minLength={3}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Skill Level</label>
+                  <select 
+                    value={editForm.skillLevel} 
+                    onChange={(e) => setEditForm({...editForm, skillLevel: e.target.value})}
+                  >
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Bio (Optional)</label>
+                  <textarea 
+                    value={editForm.bio} 
+                    onChange={(e) => setEditForm({...editForm, bio: e.target.value})}
+                    placeholder="Tell us about your coding journey..."
+                    rows={3}
+                  />
+                </div>
+                <div className="modal-actions">
+                  <button type="button" className="btn-secondary" onClick={() => setIsEditing(false)}>Cancel</button>
+                  <button type="submit" className="btn-primary" disabled={isSaving}>
+                    {isSaving ? "Saving..." : "Save Changes"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
         {/* 1. Profile Header */}
         <div className="profile-section header-card">
           <div className="header-top">
@@ -101,7 +190,8 @@ const Profile = () => {
             </div>
             <div className="header-info">
               <h1 className="profile-name">{data.username}</h1>
-              <p className="profile-title">{data.skillLevel === "beginner" ? "Aspiring Learner" : "Full Stack Learner"}</p>
+              <p className="profile-title">Level {level} {userSkill}</p>
+              {data.bio && <p className="profile-bio">{data.bio}</p>}
             </div>
           </div>
           
@@ -130,9 +220,15 @@ const Profile = () => {
               <h2 className="section-title">Your Progress</h2>
               <p className="progress-subtitle">You're {journeyProgress}% through your next milestone</p>
             </div>
-            <div className="streak-badge">
-              <span className="streak-fire">🔥</span>
-              <span className="streak-count">{currentStreak} day streak</span>
+            <div className={`streak-badge ${currentStreak === 0 ? 'zero-streak' : ''}`}>
+              {currentStreak > 0 ? (
+                 <>
+                   <span className="streak-fire">🔥</span>
+                   <span className="streak-count">{currentStreak} day streak</span>
+                 </>
+              ) : (
+                 <span className="streak-count">Start your streak today 🔥</span>
+              )}
             </div>
           </div>
           <div className="journey-bar-bg">
@@ -147,8 +243,8 @@ const Profile = () => {
             <h3 className="recommend-title">Continue React Roadmap</h3>
           </div>
           <div className="recommend-action">
-            <button className="btn-primary" onClick={() => navigate('/dashboard')}>
-              Start Next Lesson →
+            <button className="btn-primary" onClick={() => navigate('/youtube')}>
+              Find Next Lesson →
             </button>
           </div>
         </div>
@@ -162,17 +258,31 @@ const Profile = () => {
                 {recentVideos.map((vid, i) => (
                   <div className="activity-item" key={i} onClick={() => navigate(`/tutorial/${vid.videoId}`)}>
                     <div className="activity-thumb">
-                      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                      <img 
+                        src={`https://img.youtube.com/vi/${vid.videoId}/mqdefault.jpg`} 
+                        alt="thumbnail" 
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }} 
+                      />
+                      <div className="activity-thumb-fallback" style={{display: 'none'}}>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                      </div>
                     </div>
                     <div className="activity-details">
-                      <p className="activity-title">{vid.title}</p>
+                      <p className="activity-title" title={vid.title}>{vid.title}</p>
                       <p className="activity-date">{new Date(vid.watchedAt).toLocaleDateString()}</p>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="empty-text">No videos watched yet. Time to start learning!</p>
+              <div className="empty-state-action">
+                <p className="empty-text">No videos watched yet.</p>
+                <button className="btn-secondary" onClick={() => navigate('/youtube')}>Start Exploring →</button>
+              </div>
             )}
           </div>
 
@@ -186,7 +296,7 @@ const Profile = () => {
                   return (
                     <div className="activity-item quiz-item" key={i}>
                       <div className="activity-details">
-                        <p className="activity-title">{quiz.topic}</p>
+                        <p className="activity-title" title={quiz.topic}>{quiz.topic}</p>
                         <p className="activity-date">{new Date(quiz.completedAt).toLocaleDateString()}</p>
                       </div>
                       <div className={`quiz-score ${scoreColor}`}>
@@ -197,14 +307,17 @@ const Profile = () => {
                 })}
               </div>
             ) : (
-              <p className="empty-text">Take your first quiz to see performance here.</p>
+              <div className="empty-state-action">
+                <p className="empty-text">No quizzes yet.</p>
+                <button className="btn-secondary" onClick={() => navigate('/youtube')}>Generate your first quiz →</button>
+              </div>
             )}
           </div>
         </div>
 
         {/* 6. Settings */}
         <div className="profile-section settings-card">
-          <button className="settings-btn edit-btn" onClick={() => toast("Edit Profile coming soon!")}>
+          <button className="settings-btn edit-btn" onClick={openEditModal}>
             Edit Profile
           </button>
           <button className="settings-btn logout-btn" onClick={handleLogout}>

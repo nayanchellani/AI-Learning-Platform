@@ -3,7 +3,8 @@ import {
     registerUser,
     loginUser,
     logoutUser,
-    getProfile
+    getProfile,
+    updateProfile
 } from "../controllers/authController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { passport } from "../config/passport.js";
@@ -15,6 +16,7 @@ router.post("/signup", registerUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 router.get("/profile", protect, getProfile);
+router.put("/profile", protect, updateProfile);
 
 router.get("/google", passport.authenticate("google", {
     scope: ["profile", "email"],

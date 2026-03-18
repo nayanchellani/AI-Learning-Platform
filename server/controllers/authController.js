@@ -105,3 +105,45 @@ export const getProfile = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
+export const updateProfile = async (req, res) => {
+    try {
+        const { username, bio, skillLevel } = req.body;
+        
+        // Find user
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Check if username is being changed and if it's already taken
+        if (username && username !== user.username) {
+            const usernameExists = await User.findOne({ username });
+            if (usernameExists) {
+                return res.status(400).json({ message: "Username is already taken" });
+            }
+            user.username = username;
+        }
+
+        // Update fields if provided
+        if (bio !== undefined) user.bio = bio;
+        if (skillLevel) {
+            if (["beginner", "intermediate", "advanced"].includes(skillLevel)) {
+                user.skillLevel = skillLevel;
+            } else {
+                return res.status(400).json({ message: "Invalid skill level" });
+            }
+        }
+
+        const updatedUser = await user.save();
+        
+        // Return user without password
+        const userResponse = updatedUser.toObject();
+        delete userResponse.password;
+        
+        res.json(userResponse);
+    } catch (error) {
+        console.error("Update profile error:", error);
+        res.status(500).json({ message: "Server error while updating profile" });
+    }
+};
