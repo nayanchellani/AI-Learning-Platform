@@ -1,4 +1,4 @@
-import React from 'react';
+import './CodeReview.css';
 
 const CodeReview = () => {
   return (

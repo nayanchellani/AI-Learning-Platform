@@ -42,7 +42,7 @@ export const registerUser = async (req, res) => {
         res.cookie("token", token, {
             httpOnly: true,
             secure: false,
-            sameSite: "strict",
+            sameSite: "lax",
         })
         res.status(201).json({ message: "User created successfully" });
     }
@@ -78,7 +78,7 @@ export const loginUser = async (req, res) => {
         res.cookie("token", token, {
             httpOnly: true,
             secure: false,
-            sameSite: "strict",
+            sameSite: "lax",
         })
         res.status(200).json({ message: "User logged in successfully" });
     }
@@ -92,4 +92,16 @@ export const loginUser = async (req, res) => {
 export const logoutUser = async (req, res) => {
     res.clearCookie("token");
     res.json({ message: "Logged out successfully" });
+};
+
+export const getProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select("-password");
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Server error" });
+    }
 };

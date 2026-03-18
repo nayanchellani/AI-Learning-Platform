@@ -1,21 +1,54 @@
-/* 
-  Global CSS for AI Learning Platform
-  Add your custom styles here! 
-*/
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --bg-primary: #0B0E14;
+  --bg-secondary: #151A22;
+  --bg-card: #1A212D;
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --accent-gold: #FFC000;
+  --accent-gold-hover: #E6A800;
+  --accent-gold-dim: rgba(255, 192, 0, 0.15);
+  --accent-blue: #00E5FF;
+  --accent-blue-dim: rgba(0, 229, 255, 0.15);
+  --accent-purple: #9D4EDD;
+  --accent-purple-dim: rgba(157, 78, 221, 0.15);
+  --success: #10B981;
+  --error: #EF4444;
+  --warning: #F59E0B;
+}
+
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Inter', sans-serif;
+  box-sizing: border-box;
 }
 
 body {
-  background-color: #F5F5F4;
-  color: #111111;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-nav {
-  background-color: #1E1E1E;
-  color: #EAB308;
-  padding: 1rem;
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
 }

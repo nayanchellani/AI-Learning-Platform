@@ -3,20 +3,19 @@ import Quiz from "../models/Quiz.js";
 
 export const generateQuizController = async (req, res) => {
     try {
-        const { videoId, title, description } = req.body;
+        const { videoId, title, topic, difficulty } = req.body;
         
         const existingQuiz = await Quiz.findOne({ videoId });
         if (existingQuiz) {
             return res.json(existingQuiz);
         }
 
-        const quizData = await generateQuiz(title, description);
-        const parsedQuiz = JSON.parse(quizData);
+        const quizQuestions = await generateQuiz(topic || title, difficulty || "medium");
 
         const quiz = await Quiz.create({ 
             videoId, 
-            title, 
-            questions: parsedQuiz 
+            title: title || topic, 
+            questions: quizQuestions 
         });
         
         res.status(201).json(quiz);
