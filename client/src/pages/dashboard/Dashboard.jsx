@@ -9,7 +9,27 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [goalChecks, setGoalChecks] = useState({ videos: null, quiz: null });
+  const [goals, setGoals] = useState(() => {
+    const saved = localStorage.getItem('learnflow_custom_goals');
+    if (saved) return JSON.parse(saved);
+    return [{ text: "Watch 2 tutorial videos", done: false }, { text: "Take 1 coding quiz", done: false }];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('learnflow_custom_goals', JSON.stringify(goals));
+  }, [goals]);
+
+  const toggleGoal = (index) => {
+    const newGoals = [...goals];
+    newGoals[index].done = !newGoals[index].done;
+    setGoals(newGoals);
+  };
+
+  const updateGoalText = (index, text) => {
+    const newGoals = [...goals];
+    newGoals[index].text = text;
+    setGoals(newGoals);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,9 +70,7 @@ const Dashboard = () => {
   const videosToday = videosWatched.filter(v => new Date(v.watchedAt).toDateString() === new Date().toDateString()).length;
   const quizzesToday = quizzesCompleted.filter(q => new Date(q.completedAt).toDateString() === new Date().toDateString()).length;
 
-  const isVideoGoalDone = goalChecks.videos !== null ? goalChecks.videos : videosToday >= 2;
-  const isQuizGoalDone = goalChecks.quiz !== null ? goalChecks.quiz : quizzesToday >= 1;
-  const dailyGoalProgress = (isVideoGoalDone ? 1 : 0) + (isQuizGoalDone ? 1 : 0);
+  const dailyGoalProgress = goals.filter(g => g.done).length;
 
   let avgScore = 0;
   let scoreText = '0%';
@@ -107,15 +125,13 @@ const Dashboard = () => {
 
       <div className="bento-grid">
         
-        {/* COLUMN 1: YOUR JOURNEY */}
         <div className="bento-col bento-col-left">
-          <div className="col-header">YOUR JOURNEY</div>
           
           <div className="bento-card progress-card">
             <h3>Your Progress</h3>
             <div className="level-badge-box">
               <div className="level-icon-wrapper">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                
               </div>
               <div className="level-text">
                 <div className="level-name">{skillCapitalized} LEVEL</div>
@@ -137,25 +153,21 @@ const Dashboard = () => {
           <div className="bento-card goal-card">
             <h3>Daily Goal</h3>
             <div className="goal-list">
-              <div className="goal-item clickable" onClick={() => setGoalChecks(prev => ({ ...prev, videos: !(prev.videos !== null ? prev.videos : videosToday >= 2) }))}>
-                <span className={`goal-check ${isVideoGoalDone ? 'done' : ''}`}></span>
-                <span className={isVideoGoalDone ? 'goal-done-text' : ''}>Watch 2 videos in {heroTitle.split('-')[0].substring(0, 20)}...</span>
-              </div>
-              <div className="goal-item clickable" onClick={() => setGoalChecks(prev => ({ ...prev, quiz: !(prev.quiz !== null ? prev.quiz : quizzesToday >= 1) }))}>
-                <span className={`goal-check ${isQuizGoalDone ? 'done' : ''}`}></span>
-                <span className={isQuizGoalDone ? 'goal-done-text' : ''}>Take 1 Context API quiz</span>
-              </div>
+              {goals.map((goal, idx) => (
+                <div className="goal-item" key={idx}>
+                  <span className={`goal-check ${goal.done ? 'done' : ''} clickable`} onClick={() => toggleGoal(idx)}></span>
+                  <input type="text" className={`goal-input ${goal.done ? 'goal-done-text' : ''}`} value={goal.text} onChange={(e) => updateGoalText(idx, e.target.value)} />
+                </div>
+              ))}
             </div>
             <div className="goal-footer">
-              <span className="goal-progress-text">Goal tracker: {dailyGoalProgress}/2</span>
+              <span className="goal-progress-text">Goal tracker: {dailyGoalProgress}/{goals.length}</span>
             </div>
           </div>
         </div>
 
 
-        {/* COLUMN 2: FEATURED COURSE */}
         <div className="bento-col bento-col-center">
-          <div className="col-header">FEATURED COURSE</div>
           
           <div className="bento-card hero-card">
             <div className="hero-thumb">
@@ -178,9 +190,7 @@ const Dashboard = () => {
         </div>
 
 
-        {/* COLUMN 3: ACTIVITY SNAPSHOT */}
         <div className="bento-col bento-col-right">
-          <div className="col-header">ACTIVITY SNAPSHOT</div>
           
           <div className="snapshot-row">
             <div className="bento-card bento-stat">
@@ -205,8 +215,6 @@ const Dashboard = () => {
               <span className="stat-sub" style={{color: 'var(--accent-gold)'}}>{streak > 0 ? 'Keep going!' : 'Start today!'}</span>
             </div>
           </div>
-
-          <div className="col-header mt-gap">LEARNING SUMMARY</div>
           
           <div className="bento-card summary-card">
             <div className="summary-col">
@@ -242,7 +250,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* BOTTOM WIDE ROW */}
         <div className="bento-wide watching-bento">
           <div className="watching-header">
             <h2>Continue Watching</h2>
@@ -266,7 +273,7 @@ const Dashboard = () => {
           ) : (
             <div className="bento-empty-state">
               <p>Start learning to see progress here &rarr;</p>
-              <button onClick={() => navigate('/youtube')}>Find Tutorials</button>
+              <button className="bento-btn-primary" onClick={() => navigate('/youtube')}>Find Tutorials</button>
             </div>
           )}
         </div>
