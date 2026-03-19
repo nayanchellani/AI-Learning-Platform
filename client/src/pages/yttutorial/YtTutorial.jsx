@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { customToast } from '../../utils/toastUtils';
@@ -13,12 +13,17 @@ const YtTutorial = () => {
   const [quizLoading, setQuizLoading] = useState(false);
   const [quizData, setQuizData] = useState(null);
 
+  const hasTracked = useRef(false);
+
   useEffect(() => {
     if (!video) {
       customToast.error("Video details not found. Please select a video from search.");
       navigate('/youtube');
     } else {
-      trackProgress(video);
+      if (!hasTracked.current) {
+        hasTracked.current = true;
+        trackProgress(video);
+      }
     }
   }, [video, navigate]);
 

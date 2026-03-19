@@ -401,7 +401,7 @@
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
+  transform: none; /* User requested remove scale up hover */
   background: #e5ad00;
 }
 
@@ -429,11 +429,12 @@
   border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
 .settings-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.12);
+  transform: scale(1.02); /* Simple background animated scale */
 }
 
 /* Outlined logout button per user request */
@@ -441,12 +442,14 @@
   background: transparent;
   color: #ef4444;
   border: 1px solid rgba(239, 68, 68, 0.4);
+  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .logout-btn:hover {
-  background: rgba(239, 68, 68, 0.1);
+  background-color: rgba(239, 68, 68, 0.1);
   color: #f87171;
   border-color: rgba(239, 68, 68, 0.8);
+  transform: scale(1.02); /* Simple background animated scale */
 }
 
 /* Modal Overlay */

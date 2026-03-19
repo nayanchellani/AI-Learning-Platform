@@ -8,29 +8,14 @@ const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [profileData, setProfileData] = useState(null);
-  const [recommendedVideos, setRecommendedVideos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [goalChecks, setGoalChecks] = useState({ videos: false, quiz: false });
+  const [goalChecks, setGoalChecks] = useState({ videos: null, quiz: null });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const profileRes = await axios.get('/api/auth/profile');
         setProfileData(profileRes.data);
-
-        const pd = profileRes.data;
-        const watched = pd?.progress?.videosWatched || [];
-        let recQuery = 'programming tutorial for beginners';
-
-        if (watched.length > 0) {
-          const sorted = [...watched].sort((a, b) => new Date(b.watchedAt) - new Date(a.watchedAt));
-          const lastTitle = sorted[0]?.title || '';
-          const words = lastTitle.split(' ').filter(w => w.length > 3).slice(0, 3);
-          if (words.length > 0) recQuery = words.join(' ') + ' tutorial';
-        }
-
-        const recRes = await axios.get(`/api/videos/search?q=${encodeURIComponent(recQuery)}`);
-        setRecommendedVideos((recRes.data || []).slice(0, 4));
       } catch (error) {
         console.error(error);
       } finally {
@@ -65,14 +50,16 @@ const Dashboard = () => {
   const videosToday = videosWatched.filter(v => new Date(v.watchedAt).toDateString() === new Date().toDateString()).length;
   const quizzesToday = quizzesCompleted.filter(q => new Date(q.completedAt).toDateString() === new Date().toDateString()).length;
 
-  const goalVideosDone = goalChecks.videos || videosToday >= 2;
-  const goalQuizDone = goalChecks.quiz || quizzesToday >= 1;
-  const dailyGoalProgress = (goalVideosDone ? 2 : 0) + (goalQuizDone ? 1 : 0);
+  const isVideoGoalDone = goalChecks.videos !== null ? goalChecks.videos : videosToday >= 2;
+  const isQuizGoalDone = goalChecks.quiz !== null ? goalChecks.quiz : quizzesToday >= 1;
+  const dailyGoalProgress = (isVideoGoalDone ? 1 : 0) + (isQuizGoalDone ? 1 : 0);
 
   let avgScore = 0;
+  let scoreText = '0%';
   if (quizzesCompleted.length > 0) {
     const totalPercentage = quizzesCompleted.reduce((acc, q) => acc + (q.totalQuestions ? (q.score / q.totalQuestions) * 100 : 0), 0);
     avgScore = Math.round(totalPercentage / quizzesCompleted.length);
+    scoreText = `${avgScore}%`;
   }
 
   const recentVideosMap = new Map();
@@ -81,29 +68,33 @@ const Dashboard = () => {
   });
   const recentVideos = Array.from(recentVideosMap.values());
 
-  const recentQuizzes = [...quizzesCompleted]
-    .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))
-    .slice(0, 3);
-
   const codingHours = Math.floor(codingTimeTotal / 60);
   const codingMins = codingTimeTotal % 60;
-  const codingDisplay = codingTimeTotal === 0 ? '0 hrs' : codingHours > 0 ? `${codingHours} hrs` : `${codingMins} min`;
+  const codingDisplay = codingTimeTotal === 0 ? '0h' : codingHours > 0 ? `${codingHours}h ${codingMins}m` : `${codingMins}m`;
 
   const isNewUser = videosWatched.length === 0 && quizzesCompleted.length === 0;
-  let heroTitle = 'Start Your Coding Journey';
-  let heroSubtitle = 'Python or Java? Maybe JavaScript? Or C++?';
-  let heroLabel = 'Get Started';
-  let heroNav = '/youtube';
+  let heroTitle = 'Python for Beginners - Master Coding with Python in 1 Hour';
+  let heroSubtitle = `Last watched • ${new Date().toLocaleDateString()}`;
+  let heroVideo = recentVideos.length > 0 ? recentVideos[0] : null;
 
-  if (!isNewUser && recentVideos.length > 0) {
-    heroTitle = recentVideos[0].title || 'Continue Learning';
-    heroSubtitle = `Last watched • ${new Date(recentVideos[0].watchedAt).toLocaleDateString()}`;
-    heroLabel = 'Continue Learning';
-    heroNav = `/tutorial/${recentVideos[0].videoId}`;
+  if (isNewUser) {
+    heroTitle = 'Start Your Coding Journey by Searching for a Tutorial';
+    heroSubtitle = 'Explore the tutorials tab';
+  } else if (heroVideo) {
+    heroTitle = heroVideo.title;
+    heroSubtitle = `Last watched • ${new Date(heroVideo.watchedAt).toLocaleDateString()}`;
   }
 
   const totalActivities = videosWatched.length + quizzesCompleted.length;
   const progressPercent = Math.min(100, Math.round((totalActivities / 50) * 100));
+
+  const handleResume = () => {
+    if (isNewUser || !heroVideo) {
+      navigate('/youtube');
+    } else {
+      navigate(`/tutorial/${heroVideo.videoId}`, { state: { video: heroVideo } });
+    }
+  };
 
   return (
     <div className="dashboard-page">
@@ -111,112 +102,155 @@ const Dashboard = () => {
       <div className="dash-welcome-row">
         <div className="welcome-text">
           <h1>Welcome back, {data.username || 'Learner'}!</h1>
-          <p>Here's your learning progress and achievements</p>
         </div>
       </div>
 
       <div className="bento-grid">
-
-        <div className="bento-card bento-hero">
-          <div className="hero-content">
-            <span className="hero-label">{heroLabel}</span>
-            <h1 className="hero-title">{heroTitle}</h1>
-            <div className="hero-meta">
-              <span className="hero-meta-item">{heroSubtitle}</span>
-            </div>
-          </div>
-          <button className="bento-btn-primary" onClick={() => navigate(heroNav)}>
-            {isNewUser ? 'Explore Tutorials' : 'Resume Learning'} &rarr;
-          </button>
-        </div>
-
-        <div className="bento-card bento-stat">
-          <div className="stat-icon-box">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
-          </div>
-          <div className="stat-main">
-            <span className="stat-val">{videosWatched.length}</span>
-            <span className="stat-lbl">Videos Watched</span>
-          </div>
-          <span className="stat-sub">+{videosThisWeek} this week</span>
-        </div>
-
-        <div className="bento-card bento-stat">
-          <div className="stat-icon-box">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-          </div>
-          <div className="stat-main">
-            <span className="stat-val">{quizzesCompleted.length}</span>
-            <span className="stat-lbl">Quizzes Completed</span>
-          </div>
-          <span className="stat-sub">{avgScore}% avg score</span>
-        </div>
-
-        <div className="bento-card bento-stat">
-          <div className="stat-icon-box">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-          </div>
-          <div className="stat-main">
-            <span className="stat-val">{codingDisplay}</span>
-            <span className="stat-lbl">Coding Time</span>
-          </div>
-          <span className="stat-sub">+0 min this week</span>
-        </div>
-
-        <div className="bento-card bento-stat">
-          <div className="stat-icon-box accent">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
-          </div>
-          <div className="stat-main">
-            <span className="stat-val">{streak}</span>
-            <span className="stat-lbl">Day Streak</span>
-          </div>
-          <span className="stat-sub">{streak > 0 ? 'Keep going!' : 'Start today!'}</span>
-        </div>
-
-        <div className="bento-card bento-medium progress-split">
-          <div className="split-header">
-            <h2>Your Learning Progress</h2>
-            <span className="skill-badge">{skillCapitalized} Level</span>
-          </div>
-          <div className="progress-content">
-            <div className="bar-wrapper">
-              <div className="bar-bg">
-                <div className="bar-fill" style={{ width: `${progressPercent}%` }}></div>
+        
+        {/* COLUMN 1: YOUR JOURNEY */}
+        <div className="bento-col bento-col-left">
+          <div className="col-header">YOUR JOURNEY</div>
+          
+          <div className="bento-card progress-card">
+            <h3>Your Progress</h3>
+            <div className="level-badge-box">
+              <div className="level-icon-wrapper">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
               </div>
-              <span className="bar-text">{progressPercent}%</span>
+              <div className="level-text">
+                <div className="level-name">{skillCapitalized} LEVEL</div>
+                <div className="level-sub">{skillCapitalized} Level</div>
+              </div>
             </div>
-            <p className="progress-next-text">{totalActivities < 10 ? 'Next: Complete 10 activities' : totalActivities < 25 ? 'Next: Reach 25 activities' : 'Next: Master 50 activities'}</p>
+            
+            <div className="progress-content">
+              <div className="bar-wrapper">
+                <div className="bar-bg">
+                  <div className="bar-fill" style={{ width: `${progressPercent}%` }}></div>
+                </div>
+                <span className="bar-text">{progressPercent}%</span>
+              </div>
+              <p className="progress-next-text">Next: Complete {isNewUser ? '10 activities' : '50 activities'}</p>
+            </div>
+          </div>
+
+          <div className="bento-card goal-card">
+            <h3>Daily Goal</h3>
+            <div className="goal-list">
+              <div className="goal-item clickable" onClick={() => setGoalChecks(prev => ({ ...prev, videos: !(prev.videos !== null ? prev.videos : videosToday >= 2) }))}>
+                <span className={`goal-check ${isVideoGoalDone ? 'done' : ''}`}></span>
+                <span className={isVideoGoalDone ? 'goal-done-text' : ''}>Watch 2 videos in {heroTitle.split('-')[0].substring(0, 20)}...</span>
+              </div>
+              <div className="goal-item clickable" onClick={() => setGoalChecks(prev => ({ ...prev, quiz: !(prev.quiz !== null ? prev.quiz : quizzesToday >= 1) }))}>
+                <span className={`goal-check ${isQuizGoalDone ? 'done' : ''}`}></span>
+                <span className={isQuizGoalDone ? 'goal-done-text' : ''}>Take 1 Context API quiz</span>
+              </div>
+            </div>
+            <div className="goal-footer">
+              <span className="goal-progress-text">Goal tracker: {dailyGoalProgress}/2</span>
+            </div>
           </div>
         </div>
 
-        <div className="bento-card bento-medium daily-goal-split">
-          <h2>Daily Goal</h2>
-          <div className="goal-list">
-            <div className="goal-item clickable" onClick={() => !goalVideosDone && setGoalChecks(prev => ({ ...prev, videos: !prev.videos }))}>
-              <span className={`goal-check ${goalVideosDone ? 'done' : ''}`}></span>
-              <span className={goalVideosDone ? 'goal-done-text' : ''}>Watch 2 videos</span>
+
+        {/* COLUMN 2: FEATURED COURSE */}
+        <div className="bento-col bento-col-center">
+          <div className="col-header">FEATURED COURSE</div>
+          
+          <div className="bento-card hero-card">
+            <div className="hero-thumb">
+              {heroVideo ? (
+                <img src={`https://img.youtube.com/vi/${heroVideo.videoId}/maxresdefault.jpg`} onError={(e) => e.target.src = `https://img.youtube.com/vi/${heroVideo.videoId}/hqdefault.jpg`} alt="Course Thumbnail" />
+              ) : (
+                <div className="hero-thumb-placeholder">Search for tutorials to see them here</div>
+              )}
             </div>
-            <div className="goal-item clickable" onClick={() => !goalQuizDone && setGoalChecks(prev => ({ ...prev, quiz: !prev.quiz }))}>
-              <span className={`goal-check ${goalQuizDone ? 'done' : ''}`}></span>
-              <span className={goalQuizDone ? 'goal-done-text' : ''}>Take 1 quiz</span>
+            <h1 className="hero-title">{heroTitle}</h1>
+            <div className="hero-meta">{heroSubtitle}</div>
+            
+            <div className="hero-action-row">
+              <div className="module-info">Module 1 of 1</div>
+              <button className="bento-btn-primary" onClick={handleResume}>
+                {isNewUser ? 'Find Tutorials' : 'Resume Learning'} &rarr;
+              </button>
             </div>
-          </div>
-          <div className="goal-footer">
-            <span className="goal-progress-text">Progress: {dailyGoalProgress}/3</span>
-            {dailyGoalProgress === 3 && <span className="goal-complete">Completed! 🎉</span>}
           </div>
         </div>
 
-        <div className="bento-card bento-wide watching-bento">
+
+        {/* COLUMN 3: ACTIVITY SNAPSHOT */}
+        <div className="bento-col bento-col-right">
+          <div className="col-header">ACTIVITY SNAPSHOT</div>
+          
+          <div className="snapshot-row">
+            <div className="bento-card bento-stat">
+              <div className="stat-top-right">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              </div>
+              <div className="stat-main">
+                <span className="stat-val">{codingDisplay}</span>
+                <span className="stat-lbl">Coding Time</span>
+              </div>
+              <span className="stat-sub">+0 min this week</span>
+            </div>
+
+            <div className="bento-card bento-stat">
+              <div className="stat-top-right">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+              </div>
+              <div className="stat-main">
+                <span className="stat-val">{streak}</span>
+                <span className="stat-lbl">Day Streak</span>
+              </div>
+              <span className="stat-sub" style={{color: 'var(--accent-gold)'}}>{streak > 0 ? 'Keep going!' : 'Start today!'}</span>
+            </div>
+          </div>
+
+          <div className="col-header mt-gap">LEARNING SUMMARY</div>
+          
+          <div className="bento-card summary-card">
+            <div className="summary-col">
+              <div className="summary-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+              </div>
+              <div className="summary-val">{videosWatched.length}</div>
+              <div className="summary-lbl">Videos<br/>Watched</div>
+              <div className="summary-sub" style={{color: '#10b981'}}>+{videosThisWeek} this week</div>
+            </div>
+
+            <div className="summary-divider"></div>
+
+            <div className="summary-col">
+               <div className="summary-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </div>
+              <div className="summary-val">{quizzesCompleted.length}</div>
+              <div className="summary-lbl">Quizzes<br/>Completed</div>
+              <div className="summary-sub" style={{color: 'var(--accent-gold)'}}>{scoreText} avg score</div>
+            </div>
+
+            <div className="summary-divider"></div>
+
+            <div className="summary-col">
+               <div className="summary-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+              </div>
+              <div className="summary-val">{scoreText}</div>
+              <div className="summary-lbl">Avg Score</div>
+              <div className="summary-sub">&nbsp;</div>
+            </div>
+          </div>
+        </div>
+
+        {/* BOTTOM WIDE ROW */}
+        <div className="bento-wide watching-bento">
           <div className="watching-header">
             <h2>Continue Watching</h2>
-            {streak > 0 && <span className="streak-motivation">🔥 {streak}-day streak! Keep it up!</span>}
           </div>
           {recentVideos.length > 0 ? (
             <div className="watching-scroller">
               {recentVideos.map((vid, idx) => (
-                <div className="watch-card" key={idx} onClick={() => navigate(`/tutorial/${vid.videoId}`)}>
+                <div className="watch-card" key={idx} onClick={() => navigate(`/tutorial/${vid.videoId}`, { state: { video: vid } })}>
                   <div className="watch-thumb">
                     <img src={`https://img.youtube.com/vi/${vid.videoId}/mqdefault.jpg`} alt="thumb" />
                     <div className="watch-red-bar">
@@ -233,48 +267,6 @@ const Dashboard = () => {
             <div className="bento-empty-state">
               <p>Start learning to see progress here &rarr;</p>
               <button onClick={() => navigate('/youtube')}>Find Tutorials</button>
-            </div>
-          )}
-        </div>
-
-        <div className="bento-card bento-medium flex-col">
-          <div className="quiz-header-row">
-            <h2>Recent Quiz Results</h2>
-            {recentQuizzes.length > 0 && <span className="resume-quiz-link" onClick={() => navigate('/youtube')}>Take Quiz &rarr;</span>}
-          </div>
-          {recentQuizzes.length > 0 ? (
-            <div className="bento-quiz-list">
-              {recentQuizzes.map((q, idx) => (
-                <div className="bento-quiz-item" key={idx}>
-                  <span className="quiz-name">{q.topic || 'Random Quiz'}</span>
-                  <span className="quiz-score">{q.score}/{q.totalQuestions}</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="bento-empty-state small">
-              <p>Take your first quiz to track results &rarr;</p>
-              <button onClick={() => navigate('/youtube')}>Find Tutorials</button>
-            </div>
-          )}
-        </div>
-
-        <div className="bento-card bento-medium flex-col">
-          <h2>Recommended For You</h2>
-          {recommendedVideos.length > 0 ? (
-            <div className="bento-rec-list">
-              {recommendedVideos.map((vid, idx) => (
-                <div className="bento-rec-item" key={idx} onClick={() => navigate(`/tutorial/${vid.videoId}`)}>
-                  <div className="rec-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-                  </div>
-                  <span className="rec-title">{vid.title}</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="bento-empty-state small">
-              <p>Watch tutorials to get personalized recommendations &rarr;</p>
             </div>
           )}
         </div>
