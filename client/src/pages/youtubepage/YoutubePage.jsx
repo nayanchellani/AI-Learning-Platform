@@ -47,16 +47,16 @@ const YoutubePage = () => {
   }, [typingPlaceholder, isDeleting, placeholderIndex]);
 
   useEffect(() => {
-    fetchTrending();
+    fetchDefaultFeed();
   }, []);
 
-  const fetchTrending = async () => {
+  const fetchDefaultFeed = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('/api/videos/trending');
+      const res = await axios.get(`/api/videos/search?q=${encodeURIComponent('programming tutorials coding 2024')}`);
       setVideos(res.data);
     } catch (error) {
-      console.error("Error fetching trending:", error);
+      console.error("Error fetching feed:", error);
     } finally {
       setLoading(false);
     }
@@ -64,7 +64,7 @@ const YoutubePage = () => {
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    if (!searchQuery.trim()) return fetchTrending();
+    if (!searchQuery.trim()) return fetchDefaultFeed();
     
     setLoading(true);
     try {
@@ -118,7 +118,7 @@ const YoutubePage = () => {
               <button 
                 type="button" 
                 className="search-clear-btn" 
-                onClick={() => { setSearchQuery(''); fetchTrending(); }}
+                onClick={() => { setSearchQuery(''); fetchDefaultFeed(); }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="18" y1="6" x2="6" y2="18" />
