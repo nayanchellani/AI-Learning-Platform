@@ -90,6 +90,14 @@
   background-color: rgba(255, 255, 255, 0.05);
 }
 
+.navbar-profile-btn.active {
+  color: var(--accent-gold);
+}
+
+.navbar-profile-btn.active:hover {
+  color: var(--accent-gold-hover);
+}
+
 .navbar-chevron {
   transition: transform 0.25s ease;
 }
