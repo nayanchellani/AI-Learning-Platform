@@ -14,10 +14,12 @@
   width: 100%;
   max-width: 860px;
   padding: 0.6rem 1.25rem;
-  background-color: var(--bg-secondary);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background-color: rgba(21, 26, 34, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 50px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .navbar-logo {
@@ -64,6 +66,7 @@
 
 .navbar-link.active {
   color: var(--accent-gold);
+  font-weight: 600;
 }
 
 .navbar-profile-wrapper {
@@ -100,11 +103,13 @@
   top: calc(100% + 0.75rem);
   right: 0;
   min-width: 160px;
-  background-color: var(--bg-secondary);
+  background-color: rgba(21, 26, 34, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   padding: 0.4rem;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
   z-index: 200;
   animation: dropdownFade 0.15s ease;
 }

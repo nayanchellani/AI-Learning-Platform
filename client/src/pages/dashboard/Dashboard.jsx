@@ -87,7 +87,7 @@ const Dashboard = () => {
 
   const codingHours = Math.floor(codingTimeTotal / 60);
   const codingMins = codingTimeTotal % 60;
-  const codingDisplay = codingTimeTotal === 0 ? '0h' : codingHours > 0 ? `${codingHours}h ${codingMins}m` : `${codingMins}m`;
+  const codingDisplay = codingTimeTotal === 0 ? '0 hrs' : codingHours > 0 ? `${codingHours} hrs` : `${codingMins} min`;
 
   const isNewUser = videosWatched.length === 0 && quizzesCompleted.length === 0;
   let heroTitle = 'Start Your Coding Journey';
@@ -131,8 +131,8 @@ const Dashboard = () => {
         </div>
 
         <div className="bento-card bento-stat">
-          <div className="stat-top-row">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+          <div className="stat-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
           </div>
           <div className="stat-main">
             <span className="stat-val">{videosWatched.length}</span>
@@ -142,8 +142,8 @@ const Dashboard = () => {
         </div>
 
         <div className="bento-card bento-stat">
-          <div className="stat-top-row">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          <div className="stat-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
           </div>
           <div className="stat-main">
             <span className="stat-val">{quizzesCompleted.length}</span>
@@ -153,23 +153,23 @@ const Dashboard = () => {
         </div>
 
         <div className="bento-card bento-stat">
-          <div className="stat-top-row">
-             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+          <div className="stat-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
           </div>
           <div className="stat-main">
             <span className="stat-val">{codingDisplay}</span>
             <span className="stat-lbl">Coding Time</span>
           </div>
-          <span className="stat-sub">+0m this week</span>
+          <span className="stat-sub">+0 min this week</span>
         </div>
 
-        <div className="bento-card bento-stat streak-stat">
-          <div className="stat-top-row fire">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"></path></svg>
+        <div className="bento-card bento-stat">
+          <div className="stat-icon-box accent">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
           </div>
           <div className="stat-main">
-            <span className="stat-val fire">{streak} Days</span>
-            <span className="stat-lbl">Streak</span>
+            <span className="stat-val">{streak}</span>
+            <span className="stat-lbl">Day Streak</span>
           </div>
           <span className="stat-sub">{streak > 0 ? 'Keep going!' : 'Start today!'}</span>
         </div>
@@ -211,7 +211,7 @@ const Dashboard = () => {
         <div className="bento-card bento-wide watching-bento">
           <div className="watching-header">
             <h2>Continue Watching</h2>
-            {streak > 0 && <span className="streak-motivation">🔥 You're on a {streak}-day streak! Keep going!</span>}
+            {streak > 0 && <span className="streak-motivation">🔥 {streak}-day streak! Keep it up!</span>}
           </div>
           {recentVideos.length > 0 ? (
             <div className="watching-scroller">
