@@ -77,18 +77,6 @@ const CodeReview = () => {
 
   return (
     <div className="cr-page">
-      <div className="cr-top-bar">
-        <div className="cr-top-left">
-          <button className="cr-run-btn" onClick={handleRun} disabled={running}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            {running ? 'Running...' : 'Run'}
-          </button>
-        </div>
-        <button className="cr-review-btn" onClick={handleReview} disabled={loading}>
-          {loading ? 'Analyzing...' : 'Review Code'}
-        </button>
-      </div>
-
       <div className="cr-split">
         <div className="cr-panel cr-editor-panel">
           <div className="cr-panel-header">
@@ -103,6 +91,10 @@ const CodeReview = () => {
                 </select>
                 <svg className="cr-select-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6"/></svg>
               </div>
+              <button className="cr-run-btn" onClick={handleRun} disabled={running}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                {running ? 'Running...' : 'Run'}
+              </button>
             </div>
           </div>
           <div className="cr-editor-body">
@@ -131,6 +123,9 @@ const CodeReview = () => {
         <div className="cr-panel cr-review-panel">
           <div className="cr-panel-header">
             <span className="cr-panel-title">Code Review</span>
+            <button className="cr-review-btn" onClick={handleReview} disabled={loading}>
+              {loading ? 'Analyzing...' : 'Review Code'}
+            </button>
           </div>
 
           <div className="cr-review-body">
@@ -245,11 +240,18 @@ const CodeReview = () => {
       <div className="cr-output-panel">
         <div className="cr-panel-header">
           <span className="cr-panel-title">Output</span>
-          {output && (
+          {output && !running && (
             <button className="cr-clear-btn" onClick={() => setOutput('')}>Clear</button>
           )}
         </div>
-        <pre className="cr-output-content">{output || 'Run your code to see output here...'}</pre>
+        {running ? (
+          <div className="cr-output-loading">
+            <div className="cr-output-spinner"></div>
+            <span>Executing...</span>
+          </div>
+        ) : (
+          <pre className="cr-output-content">{output || 'Run your code to see output here...'}</pre>
+        )}
       </div>
     </div>
   );

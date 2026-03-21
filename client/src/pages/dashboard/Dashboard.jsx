@@ -64,6 +64,12 @@ const Dashboard = () => {
   const quizzesCompleted = progress.quizzesCompleted || [];
   const streak = progress.streak?.current || 0;
   const codingTimeTotal = (typeof progress.codingTime === 'object' ? progress.codingTime?.total : progress.codingTime) || 0;
+  const codeReviews = progress.codeReviews || [];
+
+  let avgCodeScore = 0;
+  if (codeReviews.length > 0) {
+    avgCodeScore = Math.round(codeReviews.reduce((acc, r) => acc + (r.score || 0), 0) / codeReviews.length);
+  }
 
   const skillLevel = data.skillLevel || 'beginner';
   const skillCapitalized = skillLevel.charAt(0).toUpperCase() + skillLevel.slice(1);
@@ -232,13 +238,13 @@ const Dashboard = () => {
           <div className="snapshot-row">
             <div className="bento-card bento-stat">
               <div className="stat-top-right">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
               </div>
               <div className="stat-main">
-                <span className="stat-val">{codingDisplay}</span>
-                <span className="stat-lbl">Coding Time</span>
+                <span className="stat-val">{codeReviews.length}</span>
+                <span className="stat-lbl">Code Reviews</span>
               </div>
-              <span className="stat-sub">+0 min this week</span>
+              <span className="stat-sub" style={{color: 'var(--accent-gold)'}}>{avgCodeScore > 0 ? `${avgCodeScore}/10 avg` : 'No reviews yet'}</span>
             </div>
 
             <div className="bento-card bento-stat">
