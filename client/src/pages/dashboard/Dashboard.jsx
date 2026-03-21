@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Doughnut } from 'react-chartjs-2';
 import './Dashboard.css';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -114,6 +118,22 @@ const Dashboard = () => {
     }
   };
 
+  const heroProgressValue = heroTitle.length > 50 ? 40 : 65;
+  const timeRemaining = heroProgressValue === 40 ? '1h 15m' : '45m';
+  const doughnutData = {
+    datasets: [{
+      data: [heroProgressValue, 100 - heroProgressValue],
+      backgroundColor: ['#FFC000', 'rgba(255,255,255,0.08)'],
+      borderWidth: 0,
+      cutout: '75%',
+    }]
+  };
+  const doughnutOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { tooltip: { enabled: false }, legend: { display: false } }
+  };
+
   return (
     <div className="dashboard-page">
 
@@ -181,7 +201,19 @@ const Dashboard = () => {
             <div className="hero-meta">{heroSubtitle}</div>
             
             <div className="hero-action-row">
-              <div className="module-info">Module 1 of 1</div>
+              <div className="hero-stats-row">
+                <div style={{ width: '45px', height: '45px', position: 'relative' }}>
+                  <Doughnut data={doughnutData} options={doughnutOptions} />
+                  <div style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 'bold', color: 'var(--text-primary)'}}>
+                    {heroProgressValue}%
+                  </div>
+                </div>
+                <div className="hero-time-left">
+                  <span style={{display: 'block', fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: '600'}}>Module 1 of 1</span>
+                  <span style={{fontSize: '0.75rem', color: 'var(--text-secondary)'}}>{timeRemaining} left</span>
+                </div>
+              </div>
+
               <button className="bento-btn-primary" onClick={handleResume}>
                 {isNewUser ? 'Find Tutorials' : 'Resume Learning'} &rarr;
               </button>
@@ -260,9 +292,6 @@ const Dashboard = () => {
                 <div className="watch-card" key={idx} onClick={() => navigate(`/tutorial/${vid.videoId}`, { state: { video: vid } })}>
                   <div className="watch-thumb">
                     <img src={`https://img.youtube.com/vi/${vid.videoId}/mqdefault.jpg`} alt="thumb" />
-                    <div className="watch-red-bar">
-                      <div className="watch-red-fill" style={{ width: `${vid.completed ? 100 : Math.floor(Math.random() * 60) + 20}%` }}></div>
-                    </div>
                   </div>
                   <div className="watch-info">
                     <h3 className="watch-title">{vid.title}</h3>

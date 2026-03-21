@@ -264,6 +264,12 @@
   padding-top: 1.5rem;
 }
 
+.hero-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
 .module-info {
   font-size: 0.9rem;
   color: var(--text-muted);
