@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
@@ -11,6 +11,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const scrollerRef = useRef(null);
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [goals, setGoals] = useState(() => {
@@ -134,6 +135,13 @@ const Dashboard = () => {
     plugins: { tooltip: { enabled: false }, legend: { display: false } }
   };
 
+  const scrollLeft = () => {
+    if (scrollerRef.current) scrollerRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+  };
+  const scrollRight = () => {
+    if (scrollerRef.current) scrollerRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+  };
+
   return (
     <div className="dashboard-page">
 
@@ -150,12 +158,9 @@ const Dashboard = () => {
           <div className="bento-card progress-card">
             <h3>Your Progress</h3>
             <div className="level-badge-box">
-              <div className="level-icon-wrapper">
-                
-              </div>
               <div className="level-text">
                 <div className="level-name">{skillCapitalized} LEVEL</div>
-                <div className="level-sub">{skillCapitalized} Level</div>
+                <div className="level-sub">Current Status</div>
               </div>
             </div>
             
@@ -285,9 +290,19 @@ const Dashboard = () => {
         <div className="bento-wide watching-bento">
           <div className="watching-header">
             <h2>Continue Watching</h2>
+            {recentVideos.length > 0 && (
+              <div className="watching-controls">
+                <button className="scroll-arrow" onClick={scrollLeft}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <button className="scroll-arrow" onClick={scrollRight}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+              </div>
+            )}
           </div>
           {recentVideos.length > 0 ? (
-            <div className="watching-scroller">
+            <div className="watching-scroller" ref={scrollerRef}>
               {recentVideos.map((vid, idx) => (
                 <div className="watch-card" key={idx} onClick={() => navigate(`/tutorial/${vid.videoId}`, { state: { video: vid } })}>
                   <div className="watch-thumb">
