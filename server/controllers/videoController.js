@@ -1,5 +1,6 @@
 import * as youtubeService from "../services/youtubeService.js";
 import User from "../models/User.js";
+import { updateStreak } from "../utils/streakHelper.js";
 
 export const getVideos = async (req, res) => {
     try {
@@ -39,6 +40,7 @@ export const trackVideoProgress = async (req, res) => {
         }
 
         await user.save();
+        await updateStreak(req.user.id);
         res.status(200).json({ message: "Progress updated", progress: user.progress });
     } catch (error) {
         res.status(500).json({ message: error.message });

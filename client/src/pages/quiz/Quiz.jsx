@@ -17,11 +17,10 @@ const Quiz = () => {
   const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState(0);
   const [results, setResults] = useState(null);
-  
-  // Pagination State
+
+
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-  // Timer State
   const [timePassed, setTimePassed] = useState(0);
 
   useEffect(() => {
@@ -32,10 +31,9 @@ const Quiz = () => {
         fetchExistingQuiz();
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, []);
 
-  // Timer Effect
   useEffect(() => {
     let timer;
     if (quiz && !submitted && !loading) {
@@ -61,7 +59,7 @@ const Quiz = () => {
 
   const generateQuiz = async (videoData) => {
     try {
-      const res = await axios.post('/api/quizzes/generate', { 
+      const res = await axios.post('/api/quizzes/generate', {
         videoId: videoData.videoId,
         title: videoData.title
       });
@@ -135,7 +133,7 @@ const Quiz = () => {
 
   const totalQuestions = quiz.questions.length;
   const currentQ = quiz.questions[currentQuestionIndex];
-  
+
   const scorePercent = Math.round((score / totalQuestions) * 100);
   const statusStr = scorePercent >= 50 ? 'Passed' : 'Failed';
   const statusColor = scorePercent >= 50 ? '#10b981' : '#ef4444';
@@ -143,11 +141,11 @@ const Quiz = () => {
   return (
     <div className="quiz-page-overlay animate-fade-in">
       <div className="quiz-card-container">
-        
+
         {/* Results View */}
         {submitted && results ? (
           <div className="quiz-results-card animate-slide-up">
-            
+
             <div className="results-header">
               <h2>Quiz Results</h2>
               <button className="quiz-close-btn" onClick={() => navigate('/youtube')} aria-label="Close Quiz">&times;</button>
@@ -172,12 +170,12 @@ const Quiz = () => {
                 <span className="stat-label">Correct Answers</span>
                 <span className="stat-value">{score}/{totalQuestions}</span>
               </div>
-              
+
               <div className="stat-item">
                 <span className="stat-label">Time Spent</span>
                 <span className="stat-value">{formatTime(timePassed)}</span>
               </div>
-              
+
               <div className="stat-item">
                 <span className="stat-label">Status</span>
                 <span className="stat-value" style={{ color: statusColor }}>{statusStr}</span>
@@ -186,7 +184,7 @@ const Quiz = () => {
 
             <div className="results-review-section">
               <h3>Question Review</h3>
-              
+
               <div className="review-list">
                 {quiz.questions.map((q, idx) => {
                   const res = results[idx];
@@ -211,14 +209,14 @@ const Quiz = () => {
                           </svg>
                         )}
                       </div>
-                      
+
                       <p className="review-question">{q.question}</p>
-                      
+
                       <div className="review-answers">
                         <p><strong>Your answer:</strong> {userAnswer || 'Skipped'}</p>
                         {!isCorrect && <p><strong>Correct answer:</strong> {res.correctAnswer}</p>}
                       </div>
-                      
+
                       {res.explanation && (
                         <p className="review-explanation">
                           <em>{res.explanation}</em>
@@ -235,10 +233,10 @@ const Quiz = () => {
                 Continue Learning
               </button>
             </div>
-            
+
           </div>
         ) : (
-          
+
           /* Active Quiz View */
           <div className="quiz-active-card animate-slide-up">
             <div className="quiz-card-header">
@@ -248,11 +246,11 @@ const Quiz = () => {
               </div>
               <div className="quiz-header-right">
                 <div className="quiz-timer">
-                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                     <circle cx="12" cy="12" r="10"></circle>
-                     <polyline points="12 6 12 12 16 14"></polyline>
-                   </svg>
-                   {formatTime(timePassed)}
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  {formatTime(timePassed)}
                 </div>
                 <button className="quiz-close-btn" onClick={() => navigate(-1)} aria-label="Close Quiz">
                   &times;
@@ -264,14 +262,14 @@ const Quiz = () => {
               <h3 className="question-text">
                 {currentQ.question}
               </h3>
-              
+
               <div className="options-grid">
                 {currentQ.options.map((option, oIndex) => {
                   const isSelected = answers[currentQuestionIndex] === option;
                   const labelLetters = ['A', 'B', 'C', 'D', 'E'];
                   return (
-                    <label 
-                      key={oIndex} 
+                    <label
+                      key={oIndex}
                       className={`quiz-option ${isSelected ? 'selected' : ''}`}
                     >
                       <input
@@ -290,9 +288,9 @@ const Quiz = () => {
             </div>
 
             <div className="quiz-card-footer">
-              <button 
-                className="quiz-nav-btn" 
-                onClick={handlePrevious} 
+              <button
+                className="quiz-nav-btn"
+                onClick={handlePrevious}
                 disabled={currentQuestionIndex === 0}
               >
                 Previous
@@ -300,23 +298,23 @@ const Quiz = () => {
 
               <div className="quiz-pagination-dots">
                 {quiz.questions.map((_, idx) => (
-                  <span 
-                    key={idx} 
+                  <span
+                    key={idx}
                     className={`dot ${idx === currentQuestionIndex ? 'active' : ''} ${answers[idx] ? 'answered' : ''}`}
                   />
                 ))}
               </div>
 
               {currentQuestionIndex < totalQuestions - 1 ? (
-                <button 
-                  className="quiz-nav-btn primary" 
+                <button
+                  className="quiz-nav-btn primary"
                   onClick={handleNext}
                 >
                   Next
                 </button>
               ) : (
-                <button 
-                  className="quiz-nav-btn submit" 
+                <button
+                  className="quiz-nav-btn submit"
                   onClick={handleSubmit}
                 >
                   Submit
