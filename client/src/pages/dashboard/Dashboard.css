@@ -43,7 +43,7 @@
 .bento-card {
   background: var(--bg-secondary);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
+  border-radius: 24px;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -63,7 +63,7 @@
   gap: 14px;
   background: rgba(255, 255, 255, 0.03);
   padding: 12px;
-  border-radius: 12px;
+  border-radius: 16px;
   margin-bottom: 1.5rem;
 }
 
@@ -176,7 +176,7 @@
   width: 22px;
   height: 22px;
   border: 2px solid rgba(255,255,255,0.15);
-  border-radius: 6px;
+  border-radius: 8px;
   display: inline-block;
   transition: all 0.2s ease;
   flex-shrink: 0;
@@ -219,7 +219,7 @@
 .hero-thumb {
   width: 100%;
   aspect-ratio: 16/9;
-  border-radius: 12px;
+  border-radius: 20px;
   background: #1e293b;
   overflow: hidden;
   margin-bottom: 1.5rem;
@@ -280,7 +280,7 @@
   color: #121212;
   border: none;
   padding: 12px 24px;
-  border-radius: 10px;
+  border-radius: 14px;
   font-weight: 600;
   font-size: 0.95rem;
   font-family: 'Inter', sans-serif;
@@ -399,8 +399,14 @@
 .watching-bento {
   background: var(--bg-secondary);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
+  border-radius: 24px;
   padding: 1.5rem;
+}
+
+.watching-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .watching-header h2 {
@@ -411,28 +417,48 @@
   margin: 0 0 1.25rem 0;
 }
 
+.watching-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.scroll-arrow {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.scroll-arrow:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--text-primary);
+}
+
 .watching-scroller {
   display: flex;
   gap: 1rem;
   overflow-x: auto;
   padding-bottom: 0.5rem;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.1) transparent;
+  scrollbar-width: none;
 }
 
 .watching-scroller::-webkit-scrollbar {
-  height: 4px;
-}
-.watching-scroller::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.15);
-  border-radius: 4px;
+  display: none;
 }
 
 .watch-card {
   flex: 0 0 280px;
   background: rgba(255,255,255,0.02);
   border: 1px solid rgba(255,255,255,0.04);
-  border-radius: 12px;
+  border-radius: 20px;
   overflow: hidden;
   cursor: pointer;
   transition: all 0.2s ease;
