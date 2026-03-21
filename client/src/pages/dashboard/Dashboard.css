@@ -38,18 +38,7 @@
   gap: 1.25rem;
 }
 
-.col-header {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  margin-bottom: 0.2rem;
-}
 
-.col-header.mt-gap {
-  margin-top: 1rem;
-}
 
 .bento-card {
   background: var(--bg-secondary);
@@ -68,7 +57,6 @@
   margin: 0 0 1.25rem 0;
 }
 
-/* Left Col: Your Journey */
 .level-badge-box {
   display: flex;
   align-items: center;
@@ -154,6 +142,22 @@
   color: var(--text-secondary);
 }
 
+.goal-input {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.95rem;
+  width: 100%;
+  outline: none;
+  transition: color 0.2s ease, border-bottom 0.2s ease;
+}
+
+.goal-input:focus {
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
 .goal-item.clickable {
   cursor: pointer;
   transition: color 0.2s ease;
@@ -204,7 +208,6 @@
   color: var(--text-secondary);
 }
 
-/* Center Col: Featured Course */
 .hero-card {
   height: 100%;
   padding: 1.5rem;
@@ -261,6 +264,12 @@
   padding-top: 1.5rem;
 }
 
+.hero-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
 .module-info {
   font-size: 0.9rem;
   color: var(--text-muted);
@@ -282,10 +291,9 @@
 
 .bento-btn-primary:hover {
   background: #d6a100;
-  transform: none; /* User requested no blur/scale/lift for Resume Learning */
+  transform: none;
 }
 
-/* Right Col: Activity Snapshot */
 .snapshot-row {
   display: flex;
   gap: 1.25rem;
@@ -338,12 +346,12 @@
   padding-top: 1rem;
 }
 
-/* Right Col: Learning Summary */
 .summary-card {
   flex-direction: row;
   align-items: stretch;
   padding: 1.5rem;
   gap: 1rem;
+  flex: 1;
 }
 
 .summary-col {
@@ -384,9 +392,15 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
-/* Wide Bottom */
 .bento-wide {
   grid-column: span 3;
+}
+
+.watching-bento {
+  background: var(--bg-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 1.5rem;
 }
 
 .watching-header h2 {
@@ -426,7 +440,7 @@
 
 .watch-card:hover {
   background: rgba(255,255,255,0.04);
-  transform: none; /* User constraint: remove scale lift hover from video cards */
+  transform: none;
   border-color: rgba(255,255,255,0.08);
 }
 

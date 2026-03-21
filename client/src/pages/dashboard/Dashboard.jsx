@@ -2,14 +2,38 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Doughnut } from 'react-chartjs-2';
 import './Dashboard.css';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [goalChecks, setGoalChecks] = useState({ videos: null, quiz: null });
+  const [goals, setGoals] = useState(() => {
+    const saved = localStorage.getItem('learnflow_custom_goals');
+    if (saved) return JSON.parse(saved);
+    return [{ text: "Watch 2 tutorial videos", done: false }, { text: "Take 1 coding quiz", done: false }];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('learnflow_custom_goals', JSON.stringify(goals));
+  }, [goals]);
+
+  const toggleGoal = (index) => {
+    const newGoals = [...goals];
+    newGoals[index].done = !newGoals[index].done;
+    setGoals(newGoals);
+  };
+
+  const updateGoalText = (index, text) => {
+    const newGoals = [...goals];
+    newGoals[index].text = text;
+    setGoals(newGoals);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,9 +74,7 @@ const Dashboard = () => {
   const videosToday = videosWatched.filter(v => new Date(v.watchedAt).toDateString() === new Date().toDateString()).length;
   const quizzesToday = quizzesCompleted.filter(q => new Date(q.completedAt).toDateString() === new Date().toDateString()).length;
 
-  const isVideoGoalDone = goalChecks.videos !== null ? goalChecks.videos : videosToday >= 2;
-  const isQuizGoalDone = goalChecks.quiz !== null ? goalChecks.quiz : quizzesToday >= 1;
-  const dailyGoalProgress = (isVideoGoalDone ? 1 : 0) + (isQuizGoalDone ? 1 : 0);
+  const dailyGoalProgress = goals.filter(g => g.done).length;
 
   let avgScore = 0;
   let scoreText = '0%';
@@ -96,6 +118,22 @@ const Dashboard = () => {
     }
   };
 
+  const heroProgressValue = heroTitle.length > 50 ? 40 : 65;
+  const timeRemaining = heroProgressValue === 40 ? '1h 15m' : '45m';
+  const doughnutData = {
+    datasets: [{
+      data: [heroProgressValue, 100 - heroProgressValue],
+      backgroundColor: ['#FFC000', 'rgba(255,255,255,0.08)'],
+      borderWidth: 0,
+      cutout: '75%',
+    }]
+  };
+  const doughnutOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { tooltip: { enabled: false }, legend: { display: false } }
+  };
+
   return (
     <div className="dashboard-page">
 
@@ -107,15 +145,13 @@ const Dashboard = () => {
 
       <div className="bento-grid">
         
-        {/* COLUMN 1: YOUR JOURNEY */}
         <div className="bento-col bento-col-left">
-          <div className="col-header">YOUR JOURNEY</div>
           
           <div className="bento-card progress-card">
             <h3>Your Progress</h3>
             <div className="level-badge-box">
               <div className="level-icon-wrapper">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                
               </div>
               <div className="level-text">
                 <div className="level-name">{skillCapitalized} LEVEL</div>
@@ -137,25 +173,21 @@ const Dashboard = () => {
           <div className="bento-card goal-card">
             <h3>Daily Goal</h3>
             <div className="goal-list">
-              <div className="goal-item clickable" onClick={() => setGoalChecks(prev => ({ ...prev, videos: !(prev.videos !== null ? prev.videos : videosToday >= 2) }))}>
-                <span className={`goal-check ${isVideoGoalDone ? 'done' : ''}`}></span>
-                <span className={isVideoGoalDone ? 'goal-done-text' : ''}>Watch 2 videos in {heroTitle.split('-')[0].substring(0, 20)}...</span>
-              </div>
-              <div className="goal-item clickable" onClick={() => setGoalChecks(prev => ({ ...prev, quiz: !(prev.quiz !== null ? prev.quiz : quizzesToday >= 1) }))}>
-                <span className={`goal-check ${isQuizGoalDone ? 'done' : ''}`}></span>
-                <span className={isQuizGoalDone ? 'goal-done-text' : ''}>Take 1 Context API quiz</span>
-              </div>
+              {goals.map((goal, idx) => (
+                <div className="goal-item" key={idx}>
+                  <span className={`goal-check ${goal.done ? 'done' : ''} clickable`} onClick={() => toggleGoal(idx)}></span>
+                  <input type="text" className={`goal-input ${goal.done ? 'goal-done-text' : ''}`} value={goal.text} onChange={(e) => updateGoalText(idx, e.target.value)} />
+                </div>
+              ))}
             </div>
             <div className="goal-footer">
-              <span className="goal-progress-text">Goal tracker: {dailyGoalProgress}/2</span>
+              <span className="goal-progress-text">Goal tracker: {dailyGoalProgress}/{goals.length}</span>
             </div>
           </div>
         </div>
 
 
-        {/* COLUMN 2: FEATURED COURSE */}
         <div className="bento-col bento-col-center">
-          <div className="col-header">FEATURED COURSE</div>
           
           <div className="bento-card hero-card">
             <div className="hero-thumb">
@@ -169,7 +201,19 @@ const Dashboard = () => {
             <div className="hero-meta">{heroSubtitle}</div>
             
             <div className="hero-action-row">
-              <div className="module-info">Module 1 of 1</div>
+              <div className="hero-stats-row">
+                <div style={{ width: '45px', height: '45px', position: 'relative' }}>
+                  <Doughnut data={doughnutData} options={doughnutOptions} />
+                  <div style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 'bold', color: 'var(--text-primary)'}}>
+                    {heroProgressValue}%
+                  </div>
+                </div>
+                <div className="hero-time-left">
+                  <span style={{display: 'block', fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: '600'}}>Module 1 of 1</span>
+                  <span style={{fontSize: '0.75rem', color: 'var(--text-secondary)'}}>{timeRemaining} left</span>
+                </div>
+              </div>
+
               <button className="bento-btn-primary" onClick={handleResume}>
                 {isNewUser ? 'Find Tutorials' : 'Resume Learning'} &rarr;
               </button>
@@ -178,9 +222,7 @@ const Dashboard = () => {
         </div>
 
 
-        {/* COLUMN 3: ACTIVITY SNAPSHOT */}
         <div className="bento-col bento-col-right">
-          <div className="col-header">ACTIVITY SNAPSHOT</div>
           
           <div className="snapshot-row">
             <div className="bento-card bento-stat">
@@ -205,8 +247,6 @@ const Dashboard = () => {
               <span className="stat-sub" style={{color: 'var(--accent-gold)'}}>{streak > 0 ? 'Keep going!' : 'Start today!'}</span>
             </div>
           </div>
-
-          <div className="col-header mt-gap">LEARNING SUMMARY</div>
           
           <div className="bento-card summary-card">
             <div className="summary-col">
@@ -242,7 +282,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* BOTTOM WIDE ROW */}
         <div className="bento-wide watching-bento">
           <div className="watching-header">
             <h2>Continue Watching</h2>
@@ -253,9 +292,6 @@ const Dashboard = () => {
                 <div className="watch-card" key={idx} onClick={() => navigate(`/tutorial/${vid.videoId}`, { state: { video: vid } })}>
                   <div className="watch-thumb">
                     <img src={`https://img.youtube.com/vi/${vid.videoId}/mqdefault.jpg`} alt="thumb" />
-                    <div className="watch-red-bar">
-                      <div className="watch-red-fill" style={{ width: `${vid.completed ? 100 : Math.floor(Math.random() * 60) + 20}%` }}></div>
-                    </div>
                   </div>
                   <div className="watch-info">
                     <h3 className="watch-title">{vid.title}</h3>
@@ -266,7 +302,7 @@ const Dashboard = () => {
           ) : (
             <div className="bento-empty-state">
               <p>Start learning to see progress here &rarr;</p>
-              <button onClick={() => navigate('/youtube')}>Find Tutorials</button>
+              <button className="bento-btn-primary" onClick={() => navigate('/youtube')}>Find Tutorials</button>
             </div>
           )}
         </div>
