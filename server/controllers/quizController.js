@@ -1,5 +1,6 @@
 import { generateQuiz } from "../services/geminiService.js";
 import Quiz from "../models/Quiz.js";
+import { updateStreak } from "../utils/streakHelper.js";
 
 export const generateQuizController = async (req, res) => {
     try {
@@ -60,6 +61,8 @@ export const submitQuiz = async (req, res) => {
                 explanation: q.explanation
             };
         });
+
+        await updateStreak(req.user.id);
 
         res.json({
             score,

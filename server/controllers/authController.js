@@ -110,13 +110,11 @@ export const updateProfile = async (req, res) => {
     try {
         const { username, bio, skillLevel } = req.body;
         
-        // Find user
         const user = await User.findById(req.user.id);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // Check if username is being changed and if it's already taken
         if (username && username !== user.username) {
             const usernameExists = await User.findOne({ username });
             if (usernameExists) {
@@ -125,7 +123,6 @@ export const updateProfile = async (req, res) => {
             user.username = username;
         }
 
-        // Update fields if provided
         if (bio !== undefined) user.bio = bio;
         if (skillLevel) {
             if (["beginner", "intermediate", "advanced"].includes(skillLevel)) {
@@ -137,7 +134,6 @@ export const updateProfile = async (req, res) => {
 
         const updatedUser = await user.save();
         
-        // Return user without password
         const userResponse = updatedUser.toObject();
         delete userResponse.password;
         

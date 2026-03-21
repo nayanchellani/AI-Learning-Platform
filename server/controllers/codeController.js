@@ -1,5 +1,6 @@
 import { reviewCode } from "../services/geminiService.js";
 import User from "../models/User.js";
+import { updateStreak } from "../utils/streakHelper.js";
 
 export const reviewCodeController = async (req, res) => {
     try {
@@ -28,6 +29,8 @@ export const reviewCodeController = async (req, res) => {
                 }
             }
         });
+
+        await updateStreak(req.user._id);
 
         res.json(feedback);
     } catch (error) {

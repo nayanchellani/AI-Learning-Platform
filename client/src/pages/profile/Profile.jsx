@@ -11,7 +11,7 @@ const Profile = () => {
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Edit Profile State
+
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({ username: '', bio: '', skillLevel: 'beginner' });
   const [isSaving, setIsSaving] = useState(false);
@@ -78,7 +78,6 @@ const Profile = () => {
   const data = profileData || user || {};
   const progress = data.progress || {};
   
-  // 1. Header Stats & Levels
   const videosWatched = progress.videosWatched || [];
   const quizzesCompleted = progress.quizzesCompleted || [];
   
@@ -90,17 +89,13 @@ const Profile = () => {
     avgScore = Math.round(totalPercentage / quizzesCompleted.length);
   }
 
-  // Calculate Level (Every 5 activities = 1 level)
   const totalActivity = quizzesCompleted.length + videosWatched.length;
   const level = Math.floor(totalActivity / 5) + 1;
   const userSkill = data.skillLevel ? data.skillLevel.charAt(0).toUpperCase() + data.skillLevel.slice(1) : "Beginner";
 
-  // 2. Learning Progress
   const currentStreak = progress.streak?.current || 0;
-  // Let's assume a milestone is every 5 activities
   const journeyProgress = totalActivity === 0 ? 0 : Math.min(100, Math.round(((totalActivity % 5) / 5) * 100));
   
-  // 3. Recent Activity (Unique Videos, Last 3)
   const uniqueVideos = [];
   const seenVideoIds = new Set();
   const sortedVideos = [...videosWatched].sort((a, b) => new Date(b.watchedAt) - new Date(a.watchedAt));
@@ -113,7 +108,6 @@ const Profile = () => {
   }
   const recentVideos = uniqueVideos.slice(0, 3);
 
-  // 4. Quiz Performance (Last 3 quizzes)
   const recentQuizzes = [...quizzesCompleted]
     .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))
     .slice(0, 3);
