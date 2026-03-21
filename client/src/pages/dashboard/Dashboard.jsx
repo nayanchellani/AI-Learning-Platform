@@ -125,8 +125,21 @@ const Dashboard = () => {
     }
   };
 
-  const heroProgressValue = heroTitle.length > 50 ? 40 : 65;
-  const timeRemaining = heroProgressValue === 40 ? '1h 15m' : '45m';
+  let heroProgressValue = 0;
+  let timeRemaining = '0m';
+  let moduleText = 'No videos yet';
+
+  if (heroVideo) {
+    heroProgressValue = heroVideo.completed ? 100 : 0;
+    const durSeconds = heroVideo.duration || 0;
+    const remainingSeconds = heroVideo.completed ? 0 : durSeconds;
+    const remainingMins = Math.floor(remainingSeconds / 60);
+    const remainingHours = Math.floor(remainingMins / 60);
+    const finalMins = remainingMins % 60;
+    
+    timeRemaining = remainingMins === 0 ? '0m' : remainingHours > 0 ? `${remainingHours}h ${finalMins}m` : `${finalMins}m`;
+    moduleText = heroVideo.completed ? 'Tutorial Completed' : 'Current Tutorial';
+  }
   const doughnutData = {
     datasets: [{
       data: [heroProgressValue, 100 - heroProgressValue],
@@ -220,7 +233,7 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <div className="hero-time-left">
-                  <span style={{display: 'block', fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: '600'}}>Module 1 of 1</span>
+                <span style={{display: 'block', fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: '600'}}>{moduleText}</span>
                   <span style={{fontSize: '0.75rem', color: 'var(--text-secondary)'}}>{timeRemaining} left</span>
                 </div>
               </div>
