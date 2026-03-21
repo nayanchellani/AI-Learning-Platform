@@ -51,7 +51,12 @@ const userSchema = new mongoose.Schema({
                 date: { type: Date, default: Date.now },
                 duration: Number
             }]
-        }
+        },
+        codeReviews: [{
+            score: Number,
+            language: String,
+            reviewedAt: { type: Date, default: Date.now }
+        }]
     },
     preferences: {
         theme: { type: String, default: "dark" },

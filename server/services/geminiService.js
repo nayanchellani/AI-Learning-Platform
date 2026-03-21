@@ -39,14 +39,21 @@ export const generateQuiz = async (topic, difficulty) => {
 
 export const reviewCode = async (code, language) => {
     try {
-        const prompt = `Review this ${language} code and provide feedback:
-        ${code}
-        Return strictly in JSON format with these fields:
-        - overall: (string) short assessment
-        - improvements: (array of strings)
-        - bestPractices: (array of strings)
-        - issues: (array of strings)
-        - rating: (number 0-10)`;
+        const prompt = `You are a senior code reviewer. Review this ${language} code:\n\n${code}\n\nReturn ONLY valid JSON with this exact structure:
+{
+  "issues": [
+    { "line": "number", "problem": "short 1-line description", "fix": "short 1-line fix" }
+  ],
+  "improvements": ["short 1-line suggestion"],
+  "bestPractices": ["short 1-line practice"],
+  "explanation": "2-3 sentence overall assessment",
+  "score": "X/10"
+}
+Rules:
+- Keep each issue problem and fix to ONE short sentence max
+- improvements and bestPractices: 2-4 items each, one sentence each
+- score must be a string like "7/10"
+- Do NOT wrap in markdown code blocks`;
 
         const result = await getModel().generateContent(prompt);
         const response = await result.response;
