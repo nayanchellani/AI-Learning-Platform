@@ -130,15 +130,36 @@ const CodeReview = () => {
 
           <div className="cr-review-body">
             {!feedback && !loading && !error && (
-              <div className="cr-empty-state">
-                <h3>No review yet</h3>
-                <p>Click "Review Code" to analyze:</p>
-                <ul className="cr-empty-checklist">
-                  <li>Errors & issues</li>
-                  <li>Improvements</li>
-                  <li>Best practices</li>
-                  <li>Code quality score</li>
-                </ul>
+              <div className="cr-skeleton-wrap">
+                <div className="cr-skeleton-blur">
+                  <div className="cr-skeleton-score"></div>
+                  <div className="cr-skeleton-card">
+                    <div className="cr-skeleton-card-head">
+                      <span className="cr-skeleton-dot" style={{background: '#ef4444'}}></span>
+                      <span className="cr-skeleton-bar w45"></span>
+                    </div>
+                    <span className="cr-skeleton-bar w80"></span>
+                    <span className="cr-skeleton-bar w60"></span>
+                  </div>
+                  <div className="cr-skeleton-card">
+                    <div className="cr-skeleton-card-head">
+                      <span className="cr-skeleton-dot" style={{background: '#FFC000'}}></span>
+                      <span className="cr-skeleton-bar w45"></span>
+                    </div>
+                    <span className="cr-skeleton-bar w70"></span>
+                    <span className="cr-skeleton-bar w60"></span>
+                  </div>
+                  <div className="cr-skeleton-card">
+                    <div className="cr-skeleton-card-head">
+                      <span className="cr-skeleton-dot" style={{background: '#10b981'}}></span>
+                      <span className="cr-skeleton-bar w45"></span>
+                    </div>
+                    <span className="cr-skeleton-bar w80"></span>
+                  </div>
+                </div>
+                <div className="cr-skeleton-overlay">
+                  <p>Click <strong>Review Code</strong> for AI-powered analysis and feedback</p>
+                </div>
               </div>
             )}
 

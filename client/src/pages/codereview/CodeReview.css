@@ -8,6 +8,16 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  position: relative;
+  z-index: 1;
+}
+
+.cr-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6, 8, 18, 0.95) 0%, rgba(8, 10, 22, 1) 100%);
+  z-index: -1;
 }
 
 @keyframes crFadeIn {
@@ -16,9 +26,9 @@
 }
 
 .cr-run-btn {
-  background: rgba(16, 185, 129, 0.12);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   padding: 0.3rem 1rem;
   border-radius: 50px;
   font-weight: 600;
@@ -32,9 +42,11 @@
 }
 
 .cr-run-btn:hover:not(:disabled) {
-  background: rgba(16, 185, 129, 0.22);
-  transform: scale(1.05);
-  box-shadow: 0 2px 12px rgba(16, 185, 129, 0.2);
+  background: rgba(16, 185, 129, 0.18);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.35);
+  transform: scale(1.04);
+  box-shadow: 0 2px 12px rgba(16, 185, 129, 0.15);
 }
 
 .cr-run-btn:disabled {
@@ -74,12 +86,13 @@
 }
 
 .cr-panel {
-  background: var(--bg-secondary);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 24px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
 }
 
 .cr-editor-panel {
@@ -163,6 +176,8 @@
   flex: 1;
   min-height: 340px;
   max-height: 420px;
+  box-shadow: inset 0 4px 16px rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.12);
 }
 
 .cr-editor-body .monaco-editor,
@@ -184,10 +199,11 @@
 }
 
 .cr-output-panel {
-  background: var(--bg-secondary);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 20px;
   overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
 }
 
 .cr-output-content {
@@ -244,52 +260,84 @@
   animation: crSpin 0.6s linear infinite;
 }
 
-.cr-empty-state {
+.cr-skeleton-wrap {
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 0.75rem;
-  padding: 2rem;
+  position: relative;
+  overflow: hidden;
 }
 
-.cr-empty-state h3 {
-  font-family: 'Outfit', sans-serif;
-  font-size: 1.1rem;
-  color: var(--text-primary);
-  margin: 0;
-}
-
-.cr-empty-state p {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin: 0;
-}
-
-.cr-empty-checklist {
-  list-style: none;
-  padding: 0;
-  margin: 0.5rem 0 0 0;
+.cr-skeleton-blur {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  text-align: left;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  filter: blur(4px);
+  opacity: 0.25;
+  pointer-events: none;
+  user-select: none;
 }
 
-.cr-empty-checklist li {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
+.cr-skeleton-score {
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, rgba(255,192,0,0.08) 0%, rgba(255,192,0,0.02) 100%);
+  border: 1px solid rgba(255,192,0,0.1);
+}
+
+.cr-skeleton-card {
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.02);
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cr-skeleton-card-head {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.cr-empty-checklist li::before {
-  content: '✔';
-  color: var(--accent-gold);
-  font-size: 0.75rem;
+.cr-skeleton-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.cr-skeleton-bar {
+  height: 10px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.cr-skeleton-bar.w60 { width: 60%; }
+.cr-skeleton-bar.w80 { width: 80%; }
+.cr-skeleton-bar.w45 { width: 45%; }
+.cr-skeleton-bar.w70 { width: 70%; }
+
+.cr-skeleton-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 2;
+  background: rgba(10, 10, 20, 0.3);
+}
+
+.cr-skeleton-overlay p {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+  max-width: 220px;
 }
 
 .cr-loading-state {
