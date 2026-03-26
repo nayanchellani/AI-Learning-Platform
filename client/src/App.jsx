@@ -8,7 +8,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Signup from './pages/signup/Signup';
 import Login from './pages/login/Login';
 import Dashboard from './pages/dashboard/Dashboard';
-import Profile from './pages/profile/Profile';
+
 import Roadmaps from './pages/roadmaps/Roadmaps';
 import CodeReview from './pages/codereview/CodeReview';
 import YoutubePage from './pages/youtubepage/YoutubePage';
@@ -32,7 +32,7 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/profile" element={<Profile />} />
+
               <Route path="/roadmaps" element={<Roadmaps />} />
               <Route path="/code-review" element={<CodeReview />} />
               <Route path="/youtube" element={<YoutubePage />} />

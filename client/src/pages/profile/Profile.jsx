@@ -5,7 +5,7 @@ import { toast } from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import './Profile.css';
 
-const Profile = () => {
+const Profile = ({ isOpen, onClose }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [profileData, setProfileData] = useState(null);
@@ -17,19 +17,20 @@ const Profile = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
+    if (!isOpen) return;
+    setLoading(true);
     const fetchProfile = async () => {
       try {
         const response = await axios.get('/api/auth/profile');
         setProfileData(response.data);
       } catch (error) {
-        console.error("Error fetching profile:", error);
         toast.error("Failed to load profile data");
       } finally {
         setLoading(false);
       }
     };
     fetchProfile();
-  }, []);
+  }, [isOpen]);
 
   const handleUpdatePicture = () => {
     toast("Picture upload mapping pending comprehensive backend AWS S3 support.");
@@ -38,6 +39,7 @@ const Profile = () => {
   const handleLogout = async () => {
     toast.success("Logged out successfully");
     await logout();
+    onClose();
     navigate('/login', { replace: true });
   };
 
@@ -67,10 +69,14 @@ const Profile = () => {
     }
   };
 
+  if (!isOpen) return null;
+
   if (loading) {
     return (
-      <div className="profile-page loading">
-        <div className="profile-skeleton-card"></div>
+      <div className="profile-overlay" onClick={onClose}>
+        <div className="profile-page loading" onClick={(e) => e.stopPropagation()}>
+          <div className="profile-skeleton-card"></div>
+        </div>
       </div>
     );
   }
@@ -113,7 +119,9 @@ const Profile = () => {
     .slice(0, 3);
 
   return (
-    <div className="profile-page">
+    <div className="profile-overlay" onClick={onClose}>
+      <button className="profile-close-btn" onClick={onClose}>×</button>
+    <div className="profile-page" onClick={(e) => e.stopPropagation()}>
       <div className="profile-container">
         
         {/* Edit Profile Modal */}
@@ -320,6 +328,7 @@ const Profile = () => {
         </div>
 
       </div>
+    </div>
     </div>
   );
 };
