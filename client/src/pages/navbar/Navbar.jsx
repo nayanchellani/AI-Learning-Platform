@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { customToast } from '../../utils/toastUtils';
+import Profile from '../profile/Profile';
 import './Navbar.css';
 
 const navLinks = [
@@ -14,6 +15,7 @@ const navLinks = [
 const Navbar = () => {
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [indicator, setIndicator] = useState({ left: 0, width: 0 });
   const location = useLocation();
   const navigate = useNavigate();
@@ -51,6 +53,7 @@ const Navbar = () => {
   };
 
   return (
+    <>
     <nav className="navbar">
       <div className="navbar-inner">
         <span className="navbar-logo">LearnFlow AI</span>
@@ -84,13 +87,13 @@ const Navbar = () => {
 
           {dropdownOpen && (
             <div className="navbar-dropdown">
-              <Link to="/profile" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
+              <button className="dropdown-item" onClick={() => { setDropdownOpen(false); setProfileOpen(true); }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                   <circle cx="12" cy="7" r="4" />
                 </svg>
                 Profile
-              </Link>
+              </button>
               <button className="dropdown-item dropdown-logout" onClick={handleLogout}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -104,6 +107,8 @@ const Navbar = () => {
         </div>
       </div>
     </nav>
+    <Profile isOpen={profileOpen} onClose={() => setProfileOpen(false)} />
+    </>
   );
 };
 
