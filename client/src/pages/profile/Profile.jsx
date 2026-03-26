@@ -120,8 +120,8 @@ const Profile = ({ isOpen, onClose }) => {
 
   return (
     <div className="profile-overlay" onClick={onClose}>
-    <div className="profile-page" onClick={(e) => e.stopPropagation()}>
       <button className="profile-close-btn" onClick={onClose}>×</button>
+    <div className="profile-page" onClick={(e) => e.stopPropagation()}>
       <div className="profile-container">
         
         {/* Edit Profile Modal */}
