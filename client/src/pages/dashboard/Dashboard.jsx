@@ -309,29 +309,27 @@ const Dashboard = () => {
         <div className="bento-wide watching-bento">
           <div className="watching-header">
             <h2>Continue Watching</h2>
-            {recentVideos.length > 0 && (
-              <div className="watching-controls">
-                <button className="scroll-arrow" onClick={scrollLeft}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-                </button>
-                <button className="scroll-arrow" onClick={scrollRight}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-                </button>
-              </div>
-            )}
           </div>
           {recentVideos.length > 0 ? (
-            <div className="watching-scroller" ref={scrollerRef}>
-              {recentVideos.map((vid, idx) => (
-                <div className="watch-card" key={idx} onClick={() => navigate(`/tutorial/${vid.videoId}`, { state: { video: vid } })}>
-                  <div className="watch-thumb">
-                    <img src={`https://img.youtube.com/vi/${vid.videoId}/mqdefault.jpg`} alt="thumb" />
+            <div className="watching-carousel-container">
+              <button className="scroll-arrow scroll-left" onClick={scrollLeft}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <div className="watching-scroller" ref={scrollerRef}>
+                {recentVideos.map((vid, idx) => (
+                  <div className="watch-card" key={idx} onClick={() => navigate(`/tutorial/${vid.videoId}`, { state: { video: vid } })}>
+                    <div className="watch-thumb">
+                      <img src={`https://img.youtube.com/vi/${vid.videoId}/mqdefault.jpg`} alt="thumb" />
+                    </div>
+                    <div className="watch-info">
+                      <h3 className="watch-title">{vid.title}</h3>
+                    </div>
                   </div>
-                  <div className="watch-info">
-                    <h3 className="watch-title">{vid.title}</h3>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
+              <button className="scroll-arrow scroll-right" onClick={scrollRight}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
             </div>
           ) : (
             <div className="bento-empty-state">

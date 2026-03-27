@@ -407,6 +407,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 1.25rem;
 }
 
 .watching-header h2 {
@@ -414,18 +415,22 @@
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--text-primary);
-  margin: 0 0 1.25rem 0;
+  margin: 0;
 }
 
-.watching-controls {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.25rem;
+.watching-carousel-container {
+  position: relative;
+  width: 100%;
 }
 
 .scroll-arrow {
-  background: rgba(255,255,255,0.05);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: var(--bg-secondary);
   border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
   border-radius: 50%;
   width: 36px;
   height: 36px;
@@ -435,6 +440,14 @@
   color: var(--text-secondary);
   transition: all 0.2s ease;
   padding: 0;
+}
+
+.scroll-arrow.scroll-left {
+  left: -18px;
+}
+
+.scroll-arrow.scroll-right {
+  right: -18px;
 }
 
 .scroll-arrow:hover {
