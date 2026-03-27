@@ -279,7 +279,7 @@ const Dashboard = () => {
               </div>
               <div className="summary-val">{videosWatched.length}</div>
               <div className="summary-lbl">Videos<br/>Watched</div>
-              <div className="summary-sub" style={{color: '#10b981'}}>+{videosThisWeek} this week</div>
+              <div className="summary-sub" style={{color: 'var(--accent-gold)'}}>+{videosThisWeek} this week</div>
             </div>
 
             <div className="summary-divider"></div>
