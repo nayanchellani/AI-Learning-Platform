@@ -13,7 +13,6 @@ import Roadmaps from './pages/roadmaps/Roadmaps';
 import CodeReview from './pages/codereview/CodeReview';
 import YoutubePage from './pages/youtubepage/YoutubePage';
 import YtTutorial from './pages/yttutorial/YtTutorial';
-import Quiz from './pages/quiz/Quiz';
 
 function App() {
   return (
@@ -37,7 +36,6 @@ function App() {
               <Route path="/code-review" element={<CodeReview />} />
               <Route path="/youtube" element={<YoutubePage />} />
               <Route path="/tutorial/:id" element={<YtTutorial />} />
-              <Route path="/quiz/:videoId" element={<Quiz />} />
             </Route>
             
             <Route path="*" element={<Navigate to="/login" replace />} />

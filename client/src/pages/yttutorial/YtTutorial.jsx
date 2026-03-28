@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { customToast } from '../../utils/toastUtils';
+import Quiz from '../quiz/Quiz';
 import './YtTutorial.css';
 
 const YtTutorial = () => {
@@ -12,6 +13,7 @@ const YtTutorial = () => {
 
   const [quizLoading, setQuizLoading] = useState(false);
   const [quizData, setQuizData] = useState(null);
+  const [quizOpen, setQuizOpen] = useState(false);
 
   const hasTracked = useRef(false);
 
@@ -105,7 +107,7 @@ const YtTutorial = () => {
              {quizData && (
                 <div className="quiz-inline-container slide-down">
                     <h3>Quiz Ready!</h3>
-                    <button className="start-quiz-btn" onClick={() => navigate(`/quiz/${video.videoId}`, { state: { video, quiz: quizData } })}>
+                    <button className="start-quiz-btn" onClick={() => setQuizOpen(true)}>
                        Start Quiz Now
                     </button>
                 </div>
@@ -132,6 +134,13 @@ const YtTutorial = () => {
           </div>
         </div>
       </div>
+
+      <Quiz 
+        isOpen={quizOpen} 
+        onClose={() => setQuizOpen(false)} 
+        video={video} 
+        initialQuiz={quizData} 
+      />
     </div>
   );
 };

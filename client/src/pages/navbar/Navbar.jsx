@@ -67,7 +67,7 @@ const Navbar = () => {
             <Link
               key={link.path}
               to={link.path}
-              className={`navbar-link ${location.pathname === link.path ? 'active' : ''}`}
+              className={`navbar-link ${location.pathname === link.path || (link.path === '/dashboard' && location.pathname === '/') ? 'active' : ''}`}
             >
               {link.label}
             </Link>

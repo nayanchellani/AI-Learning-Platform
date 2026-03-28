@@ -1,16 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { customToast } from '../../utils/toastUtils';
 import './Quiz.css';
 
-const Quiz = () => {
-  const { videoId } = useParams();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const video = location.state?.video;
-  const initialQuiz = location.state?.quiz;
-
+const Quiz = ({ isOpen, onClose, video, initialQuiz }) => {
   const [quiz, setQuiz] = useState(initialQuiz || null);
   const [loading, setLoading] = useState(!initialQuiz);
   const [answers, setAnswers] = useState({});
@@ -24,34 +17,44 @@ const Quiz = () => {
   const [timePassed, setTimePassed] = useState(0);
 
   useEffect(() => {
-    if (!quiz) {
-      if (video) {
+    if (isOpen) {
+      if (initialQuiz) {
+        setQuiz(initialQuiz);
+        setLoading(false);
+      } else if (video) {
+        setLoading(true);
         generateQuiz(video);
-      } else {
-        fetchExistingQuiz();
       }
+    } else {
+      // Reset state on close
+      setQuiz(null);
+      setAnswers({});
+      setSubmitted(false);
+      setScore(0);
+      setResults(null);
+      setCurrentQuestionIndex(0);
+      setTimePassed(0);
     }
-
-  }, []);
+  }, [isOpen, video, initialQuiz]);
 
   useEffect(() => {
     let timer;
-    if (quiz && !submitted && !loading) {
+    if (isOpen && quiz && !submitted && !loading) {
       timer = setInterval(() => {
         setTimePassed(prev => prev + 1);
       }, 1000);
     }
     return () => clearInterval(timer);
-  }, [quiz, submitted, loading]);
+  }, [isOpen, quiz, submitted, loading]);
 
-  const fetchExistingQuiz = async () => {
+  const fetchExistingQuiz = async (vidId) => {
     try {
-      const res = await axios.get(`/api/quizzes/${videoId}`);
+      const res = await axios.get(`/api/quizzes/${vidId}`);
       setQuiz(res.data);
     } catch (error) {
       console.error(error);
       customToast.error("No quiz found. Please select a video first.");
-      navigate('/dashboard');
+      onClose();
     } finally {
       setLoading(false);
     }
@@ -66,7 +69,7 @@ const Quiz = () => {
       setQuiz(res.data);
     } catch (error) {
       customToast.error(error.response?.data?.message || "Failed to generate quiz");
-      navigate(-1);
+      onClose();
     } finally {
       setLoading(false);
     }
@@ -120,11 +123,15 @@ const Quiz = () => {
     return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
+  if (!isOpen) return null;
+
   if (loading) {
     return (
-      <div className="quiz-loading-overlay">
-        <div className="quiz-spinner"></div>
-        <p>AI is analyzing the video and generating your quiz...</p>
+      <div className="quiz-page-overlay animate-fade-in">
+        <div className="quiz-loading-overlay">
+          <div className="quiz-spinner"></div>
+          <p>AI is analyzing the video and generating your quiz...</p>
+        </div>
       </div>
     );
   }
@@ -148,7 +155,7 @@ const Quiz = () => {
 
             <div className="results-header">
               <h2>Quiz Results</h2>
-              <button className="quiz-close-btn" onClick={() => navigate('/youtube')} aria-label="Close Quiz">&times;</button>
+              <button className="quiz-close-btn" onClick={onClose} aria-label="Close Quiz">&times;</button>
             </div>
 
             <div className="results-stats-row">
@@ -229,7 +236,7 @@ const Quiz = () => {
             </div>
 
             <div className="results-footer">
-              <button className="btn-continue" onClick={() => navigate('/youtube')}>
+              <button className="btn-continue" onClick={onClose}>
                 Continue Learning
               </button>
             </div>
@@ -252,7 +259,7 @@ const Quiz = () => {
                   </svg>
                   {formatTime(timePassed)}
                 </div>
-                <button className="quiz-close-btn" onClick={() => navigate(-1)} aria-label="Close Quiz">
+                <button className="quiz-close-btn" onClick={onClose} aria-label="Close Quiz">
                   &times;
                 </button>
               </div>

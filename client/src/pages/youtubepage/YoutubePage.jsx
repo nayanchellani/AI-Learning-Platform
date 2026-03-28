@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Quiz from '../quiz/Quiz';
 import './YoutubePage.css';
 
 const placeholders = [
@@ -16,6 +17,7 @@ const YoutubePage = () => {
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [typingPlaceholder, setTypingPlaceholder] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [quizOpts, setQuizOpts] = useState({ isOpen: false, video: null });
   
   const navigate = useNavigate();
 
@@ -189,7 +191,7 @@ const YoutubePage = () => {
                     </button>
                     <button 
                       className="btn-quiz" 
-                      onClick={() => navigate(`/quiz/${video.videoId}`, { state: { video } })}
+                      onClick={() => setQuizOpts({ isOpen: true, video })}
                     >
                       Generate Quiz
                     </button>
@@ -208,6 +210,12 @@ const YoutubePage = () => {
           </div>
         )}
       </div>
+
+      <Quiz 
+        isOpen={quizOpts.isOpen} 
+        onClose={() => setQuizOpts({ ...quizOpts, isOpen: false })} 
+        video={quizOpts.video} 
+      />
     </div>
   );
 };
