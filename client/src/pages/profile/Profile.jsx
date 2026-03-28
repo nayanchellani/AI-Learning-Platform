@@ -302,7 +302,6 @@ const Profile = ({ isOpen, onClose }) => {
               </div>
             ) : (
               <div className="empty-state-action">
-                <p className="empty-text">No quizzes yet.</p>
                 <button className="btn-secondary" onClick={() => navigate('/youtube')}>Generate your first quiz →</button>
               </div>
             )}

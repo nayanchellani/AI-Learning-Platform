@@ -6,12 +6,14 @@ export const searchVideos = async (query, maxResults = 12) => {
     try {
         const API_KEY = process.env.YOUTUBE_API_KEY;
 
+        const preferredChannels = "CodeWithHarry OR Apna College OR Sheryians Coding School OR Programming with Mosh OR Coding with Sagar OR Chai aur Code OR BroCode";
+        
         const searchRes = await axios.get(`${YOUTUBE_BASE_URL}/search`, {
             params: {
                 part: "snippet",
-                q: `${query} tutorial OR full course OR lecture -shorts`,
+                q: `${query} tutorial (${preferredChannels}) -movie -trailer -shorts`,
                 type: "video",
-                videoDuration: "long", // Strictly > 20 mins to ensure lectures/courses
+                order: "relevance",
                 maxResults,
                 key: API_KEY
             }
