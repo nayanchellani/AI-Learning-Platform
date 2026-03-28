@@ -89,6 +89,9 @@
   cursor: pointer;
   transition: all 0.2s ease;
   margin-right: 12px;
+  flex-shrink: 0;
+  padding: 0;
+  aspect-ratio: 1;
 }
 
 .search-clear-btn:hover {

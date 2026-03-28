@@ -9,8 +9,9 @@ export const searchVideos = async (query, maxResults = 12) => {
         const searchRes = await axios.get(`${YOUTUBE_BASE_URL}/search`, {
             params: {
                 part: "snippet",
-                q: `${query} tutorial`,
+                q: `${query} tutorial OR full course OR lecture -shorts`,
                 type: "video",
+                videoDuration: "long", // Strictly > 20 mins to ensure lectures/courses
                 maxResults,
                 key: API_KEY
             }
