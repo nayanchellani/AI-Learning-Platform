@@ -25,7 +25,7 @@ router.get("/google", passport.authenticate("google", {
 
 router.get("/google/callback", passport.authenticate("google", {
     session: false,
-    failureRedirect: "http://localhost:5173/login"
+    failureRedirect: `${process.env.CLIENT_URL || "http://localhost:5173"}/login`
 }), (req, res) => {
     const token = jwt.sign(
         { id: req.user._id },
@@ -34,10 +34,10 @@ router.get("/google/callback", passport.authenticate("google", {
     );
     res.cookie("token", token, {
         httpOnly: true,
-        secure: false,
+        secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
     });
-    res.redirect("http://localhost:5173/dashboard");
+    res.redirect(`${process.env.CLIENT_URL || "http://localhost:5173"}/dashboard`);
 });
 
 export default router;

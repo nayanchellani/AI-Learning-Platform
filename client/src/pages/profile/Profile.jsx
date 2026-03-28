@@ -32,9 +32,6 @@ const Profile = ({ isOpen, onClose }) => {
     fetchProfile();
   }, [isOpen]);
 
-  const handleUpdatePicture = () => {
-    toast("Picture upload mapping pending comprehensive backend AWS S3 support.");
-  };
 
   const handleLogout = async () => {
     toast.success("Logged out successfully");
@@ -184,11 +181,6 @@ const Profile = ({ isOpen, onClose }) => {
                   <circle cx="12" cy="7" r="4"></circle>
                 </svg>
               </div>
-              <button className="update-pic-btn" onClick={handleUpdatePicture} title="Update Picture">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 5v14M5 12h14"></path>
-                </svg>
-              </button>
             </div>
             <div className="header-info">
               <h1 className="profile-name">{data.username}</h1>
@@ -310,7 +302,6 @@ const Profile = ({ isOpen, onClose }) => {
               </div>
             ) : (
               <div className="empty-state-action">
-                <p className="empty-text">No quizzes yet.</p>
                 <button className="btn-secondary" onClick={() => navigate('/youtube')}>Generate your first quiz →</button>
               </div>
             )}

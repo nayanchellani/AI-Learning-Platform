@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Quiz from '../quiz/Quiz';
 import './YoutubePage.css';
 
 const placeholders = [
@@ -16,6 +17,7 @@ const YoutubePage = () => {
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [typingPlaceholder, setTypingPlaceholder] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [quizOpts, setQuizOpts] = useState({ isOpen: false, video: null });
   
   const navigate = useNavigate();
 
@@ -189,7 +191,7 @@ const YoutubePage = () => {
                     </button>
                     <button 
                       className="btn-quiz" 
-                      onClick={() => navigate(`/quiz/${video.videoId}`, { state: { video } })}
+                      onClick={() => setQuizOpts({ isOpen: true, video })}
                     >
                       Generate Quiz
                     </button>
@@ -200,14 +202,17 @@ const YoutubePage = () => {
           </div>
         ) : (
           <div className="empty-state">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-            </svg>
             <h2>No tutorials found</h2>
             <p>Try searching for a different topic.</p>
           </div>
         )}
       </div>
+
+      <Quiz 
+        isOpen={quizOpts.isOpen} 
+        onClose={() => setQuizOpts({ ...quizOpts, isOpen: false })} 
+        video={quizOpts.video} 
+      />
     </div>
   );
 };
