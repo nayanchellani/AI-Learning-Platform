@@ -105,7 +105,7 @@ const YoutubePage = () => {
   return (
     <div className="youtube-page">
       <div className="youtube-header">
-        <h1 className="youtube-title">Search Resources</h1>
+        <h1 className="youtube-title">Search</h1>
         <p className="youtube-subtitle">Find the best YouTube videos, documentation, and articles curated specifically for your learning journey.</p>
         
         <form onSubmit={handleSearch} className="search-container">
@@ -141,9 +141,9 @@ const YoutubePage = () => {
         {hasSearched && !loading && !hasEmptyResults && (
           <div className="search-tabs">
             <button className={`tab-btn ${activeTab === 'all' ? 'active' : ''}`} onClick={() => setActiveTab('all')}>All Results</button>
-            <button className={`tab-btn ${activeTab === 'videos' ? 'active' : ''}`} onClick={() => setActiveTab('videos')}>🎥 Videos ({results.videos.length})</button>
-            <button className={`tab-btn ${activeTab === 'docs' ? 'active' : ''}`} onClick={() => setActiveTab('docs')}>📘 Documentation ({results.docs.length})</button>
-            <button className={`tab-btn ${activeTab === 'articles' ? 'active' : ''}`} onClick={() => setActiveTab('articles')}>📰 Articles ({results.articles.length})</button>
+            <button className={`tab-btn ${activeTab === 'videos' ? 'active' : ''}`} onClick={() => setActiveTab('videos')}>Videos ({results.videos.length})</button>
+            <button className={`tab-btn ${activeTab === 'docs' ? 'active' : ''}`} onClick={() => setActiveTab('docs')}>Documentation ({results.docs.length})</button>
+            <button className={`tab-btn ${activeTab === 'articles' ? 'active' : ''}`} onClick={() => setActiveTab('articles')}>Articles ({results.articles.length})</button>
           </div>
         )}
       </div>
@@ -151,34 +151,25 @@ const YoutubePage = () => {
       <div className="youtube-content">
         {!hasSearched && !loading ? (
            <div className="empty-state">
-             <h2>Search anything to start learning 🚀</h2>
+             <h2>Search anything to start learning</h2>
              <p>Access an AI-curated ecosystem of top-tier tutorials, official docs, and insightful articles.</p>
            </div>
         ) : loading ? (
           <div className="loading-state-wrapper">
+            <div className="simple-loader"></div>
             <p className="searching-text">Searching across resources...</p>
-            <div className="loading-grid">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="video-skeleton">
-                  <div className="skeleton-thumb"></div>
-                  <div className="skeleton-title"></div>
-                  <div className="skeleton-text"></div>
-                </div>
-              ))}
-            </div>
           </div>
         ) : hasEmptyResults ? (
           <div className="empty-state">
-            <h2>Search anything to start learning 🚀</h2>
+            <h2>Search anything to start learning</h2>
             <p>No content found. Please try tweaking your keywords.</p>
           </div>
         ) : (
           <div className="search-results-layout">
             
-            {/* VIDEOS SECTION */}
             {(activeTab === 'all' || activeTab === 'videos') && results.videos.length > 0 && (
               <div className="resource-section">
-                <h2 className="section-title">🎥 Top Video Tutorials</h2>
+                <h2 className="section-title">Top Video Tutorials</h2>
                 <div className="video-grid">
                   {results.videos.map((video) => (
                     <div key={video.videoId} className="video-card">
@@ -232,14 +223,12 @@ const YoutubePage = () => {
               </div>
             )}
 
-            {/* DOCS SECTION */}
             {(activeTab === 'all' || activeTab === 'docs') && (
-              <ResourceSection title="📘 Official Documentation" data={results.docs} />
+              <ResourceSection title="Official Documentation" data={results.docs} />
             )}
 
-            {/* ARTICLES SECTION */}
             {(activeTab === 'all' || activeTab === 'articles') && (
-              <ResourceSection title="📰 Community Articles" data={results.articles} />
+              <ResourceSection title="Community Articles" data={results.articles} />
             )}
 
           </div>

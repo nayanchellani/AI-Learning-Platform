@@ -7,7 +7,7 @@ import './Navbar.css';
 
 const navLinks = [
   { path: '/dashboard', label: 'Dashboard' },
-  { path: '/youtube', label: 'Search Resources' },
+  { path: '/youtube', label: 'Search' },
   { path: '/code-review', label: 'Code Review' },
   { path: '/roadmaps', label: 'Roadmaps' },
 ];

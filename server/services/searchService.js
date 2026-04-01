@@ -6,19 +6,13 @@ export const smartSearch = async (query) => {
     try {
         const normalizedQuery = query.toLowerCase().trim();
 
-        // 1. Check Cache first
         const cachedSearch = await SearchCache.findOne({ query: normalizedQuery });
         if (cachedSearch) {
-            console.log(`[Cache Hit] Returning cached results for: ${normalizedQuery}`);
             return cachedSearch.results;
         }
 
-        console.log(`[Cache Miss] Fetching fresh results for: ${normalizedQuery}`);
+        const videos = await searchVideos(query, 6);
 
-        // 2. Fetch from YouTube
-        const videos = await searchVideos(query, 6); // Ask youtube logic for top 6
-
-        // 3. Fetch from Serper API (Docs + Articles)
         let organic = [];
         try {
             const response = await axios.post(
@@ -34,10 +28,8 @@ export const smartSearch = async (query) => {
             organic = response.data.organic || [];
         } catch (serperError) {
             console.error("Serper API failed to fetch:", serperError.response?.data || serperError.message);
-            // Non-fatal, we'll just return videos and empty arrays for docs/articles
         }
 
-        // 4. Filter Docs
         const docs = organic.filter(item => item?.link && (
             item.link.includes("w3schools.com") ||
             item.link.includes("geeksforgeeks.org") ||
@@ -52,7 +44,6 @@ export const smartSearch = async (query) => {
             source: new URL(item.link).hostname.replace('www.', '')
         }));
 
-        // 5. Filter Articles
         const articles = organic.filter(item => item?.link && (
             item.link.includes("freecodecamp.org") ||
             item.link.includes("medium.com") ||
@@ -72,7 +63,6 @@ export const smartSearch = async (query) => {
             articles: articles.slice(0, 6),
         };
 
-        // 6. Save to Cache (Fire and forget, don't await blocking response if we don't have to)
         SearchCache.create({ query: normalizedQuery, results }).catch(err => console.error("Cache save error:", err));
 
         return results;
