@@ -11,6 +11,7 @@ import videoRoutes from "./routes/videoRoutes.js";
 import quizRoutes from "./routes/quizRoutes.js";
 import roadmapRoutes from "./routes/roadmapRoutes.js";
 import codeRoutes from "./routes/codeRoutes.js";
+import searchRoutes from "./routes/searchRoutes.js";
 import connectDB from "./config/db.js";
 
 dotenv.config({ path: "../.env" });
@@ -44,6 +45,7 @@ app.use('/api/videos', videoRoutes);
 app.use('/api/quizzes', quizRoutes);
 app.use('/api/roadmaps', roadmapRoutes);
 app.use('/api/code', codeRoutes);
+app.use('/api/search', searchRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
