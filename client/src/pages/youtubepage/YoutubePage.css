@@ -383,14 +383,6 @@
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-  cursor: default;
-}
-
-.resource-card:hover {
-  border-color: rgba(255, 192, 0, 0.3);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-  transform: translateY(-2px);
 }
 
 .resource-card-header {
@@ -410,16 +402,7 @@
   text-transform: capitalize;
 }
 
-.external-icon {
-  color: var(--text-muted);
-  opacity: 0.5;
-  transition: opacity 0.2s;
-}
 
-.resource-card:hover .external-icon {
-  opacity: 1;
-  color: var(--accent-gold);
-}
 
 .resource-title {
   font-family: 'Outfit', sans-serif;
@@ -448,7 +431,6 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
   align-self: flex-start;
   background-color: var(--accent-gold);
   color: #121212;
@@ -464,9 +446,8 @@
 }
 
 .btn-read:hover {
-  background-color: #e5ad00;
-  box-shadow: 0 4px 16px rgba(255, 192, 0, 0.3);
-  transform: translateY(-1px);
+  background-color: #ffcc33;
+  box-shadow: 0 0 12px rgba(255, 192, 0, 0.45);
 }
 
 /* --------- Tabs --------- */

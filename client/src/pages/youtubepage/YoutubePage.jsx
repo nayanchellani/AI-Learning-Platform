@@ -178,16 +178,9 @@ const YoutubePage = () => {
             {(activeTab === 'all' || activeTab === 'videos') && results.videos.length > 0 && (
               <div className="resource-section">
                 <div className="section-header">
-                  <h2 className="section-title">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="2" y="4" width="20" height="16" rx="3" stroke="#FF4444" strokeWidth="2"/>
-                      <path d="M10 9L15 12L10 15V9Z" fill="#FF4444"/>
-                    </svg>
-                    Videos
-                  </h2>
+                  <h2 className="section-title">Videos</h2>
                   <button className="view-all-btn" onClick={() => setActiveTab('videos')}>
-                    View All
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                    View All &rsaquo;
                   </button>
                 </div>
                 
@@ -258,16 +251,9 @@ const YoutubePage = () => {
             {(activeTab === 'all' || activeTab === 'docs') && results.docs && results.docs.length > 0 && (
               <div className="resource-section">
                 <div className="section-header">
-                  <h2 className="section-title">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z" stroke="#60a5fa" strokeWidth="2"/>
-                      <path d="M8 2v4M16 2v4M2 10h20" stroke="#60a5fa" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
-                    Documentation
-                  </h2>
+                  <h2 className="section-title">Documentation</h2>
                   <button className="view-all-btn" onClick={() => setActiveTab('docs')}>
-                    View All
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                    View All &rsaquo;
                   </button>
                 </div>
                 <div className="resource-grid">
