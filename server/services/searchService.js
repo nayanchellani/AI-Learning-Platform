@@ -44,23 +44,9 @@ export const smartSearch = async (query) => {
             source: new URL(item.link).hostname.replace('www.', '')
         }));
 
-        const articles = organic.filter(item => item?.link && (
-            item.link.includes("freecodecamp.org") ||
-            item.link.includes("medium.com") ||
-            item.link.includes("dev.to") ||
-            item.link.includes("hashnode.com") || 
-            item.link.includes("stackoverflow.com")
-        )).map(item => ({
-            title: item.title,
-            snippet: item.snippet,
-            link: item.link,
-            source: new URL(item.link).hostname.replace('www.', '')
-        }));
-
         const results = {
             videos: videos.slice(0, 6),
             docs: docs.slice(0, 6),
-            articles: articles.slice(0, 6),
         };
 
         SearchCache.create({ query: normalizedQuery, results }).catch(err => console.error("Cache save error:", err));

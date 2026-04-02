@@ -10,8 +10,7 @@ const SearchCacheSchema = new mongoose.Schema({
     },
     results: {
         videos: Array,
-        docs: Array,
-        articles: Array
+        docs: Array
     },
     createdAt: {
         type: Date,
