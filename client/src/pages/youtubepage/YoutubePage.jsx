@@ -1,50 +1,49 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Quiz from '../quiz/Quiz';
+import ResourceCard from './components/ResourceCard';
 import './YoutubePage.css';
 
 const placeholders = [
   "What would you like to learn today?",
-  "Which tutorial are you looking for?",
-  "Search for best tutorials all over youtube"
+  "Search for React hooks, Python basics...",
+  "Find the best videos and docs..."
 ];
 
 const YoutubePage = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [videos, setVideos] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [results, setResults] = useState({ videos: [], docs: [] });
+  const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [activeTab, setActiveTab] = useState('all');
+  
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [typingPlaceholder, setTypingPlaceholder] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [quizOpts, setQuizOpts] = useState({ isOpen: false, video: null });
   
   const navigate = useNavigate();
+  const videoCarouselRef = useRef(null);
 
   useEffect(() => {
     let timeout;
     const currentText = placeholders[placeholderIndex];
-    
     if (isDeleting) {
       if (typingPlaceholder.length === 0) {
         setIsDeleting(false);
         setPlaceholderIndex((prev) => (prev + 1) % placeholders.length);
         timeout = setTimeout(() => {}, 500);
       } else {
-        timeout = setTimeout(() => {
-          setTypingPlaceholder(currentText.substring(0, typingPlaceholder.length - 1));
-        }, 50);
+        timeout = setTimeout(() => setTypingPlaceholder(currentText.substring(0, typingPlaceholder.length - 1)), 50);
       }
     } else {
       if (typingPlaceholder.length === currentText.length) {
         timeout = setTimeout(() => setIsDeleting(true), 2000);
       } else {
-        timeout = setTimeout(() => {
-          setTypingPlaceholder(currentText.substring(0, typingPlaceholder.length + 1));
-        }, 70);
+        timeout = setTimeout(() => setTypingPlaceholder(currentText.substring(0, typingPlaceholder.length + 1)), 70);
       }
     }
-    
     return () => clearTimeout(timeout);
   }, [typingPlaceholder, isDeleting, placeholderIndex]);
 
@@ -55,8 +54,9 @@ const YoutubePage = () => {
   const fetchDefaultFeed = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`/api/videos/search?q=${encodeURIComponent('programming tutorials coding 2024')}`);
-      setVideos(res.data);
+      const res = await axios.get(`/api/search?q=${encodeURIComponent('programming tutorials')}`);
+      setResults(res.data);
+      setHasSearched(true);
     } catch (error) {
       console.error("Error fetching feed:", error);
     } finally {
@@ -66,14 +66,15 @@ const YoutubePage = () => {
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    if (!searchQuery.trim()) return fetchDefaultFeed();
+    if (!searchQuery.trim()) return;
     
     setLoading(true);
+    setHasSearched(true);
     try {
-      const res = await axios.get(`/api/videos/search?q=${encodeURIComponent(searchQuery)}`);
-      setVideos(res.data);
+      const res = await axios.get(`/api/search?q=${encodeURIComponent(searchQuery)}`);
+      setResults(res.data);
     } catch (error) {
-      console.error("Error searching videos:", error);
+      console.error("Error searching resources:", error);
     } finally {
       setLoading(false);
     }
@@ -86,7 +87,6 @@ const YoutubePage = () => {
     const h = parseInt(match[1]) || 0;
     const m = parseInt(match[2]) || 0;
     const s = parseInt(match[3]) || 0;
-    
     let result = '';
     if (h > 0) result += `${h}:`;
     result += `${h > 0 ? m.toString().padStart(2, '0') : m}:${s.toString().padStart(2, '0')}`;
@@ -101,11 +101,20 @@ const YoutubePage = () => {
     return num.toString();
   };
 
+  const scrollCarousel = (direction) => {
+    const container = videoCarouselRef.current;
+    if (!container) return;
+    const scrollAmount = container.clientWidth * 0.8;
+    container.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+  };
+
+  const hasEmptyResults = results.videos.length === 0 && results.docs.length === 0;
+
   return (
     <div className="youtube-page">
       <div className="youtube-header">
-        <h1 className="youtube-title">Explore Tutorials</h1>
-        <p className="youtube-subtitle">Find the best YouTube content curated for your learning journey.</p>
+        <h1 className="youtube-title">Search</h1>
+        <p className="youtube-subtitle">Find the best YouTube videos and documentation curated specifically for your learning journey.</p>
         
         <form onSubmit={handleSearch} className="search-container">
           <div className="search-input-wrapper">
@@ -120,7 +129,7 @@ const YoutubePage = () => {
               <button 
                 type="button" 
                 className="search-clear-btn" 
-                onClick={() => { setSearchQuery(''); fetchDefaultFeed(); }}
+                onClick={() => { setSearchQuery(''); setActiveTab('all'); fetchDefaultFeed(); }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="18" y1="6" x2="6" y2="18" />
@@ -136,74 +145,131 @@ const YoutubePage = () => {
             </button>
           </div>
         </form>
+
+        {hasSearched && !loading && !hasEmptyResults && (
+          <div className="search-tabs">
+            <button className={`tab-btn ${activeTab === 'all' ? 'active' : ''}`} onClick={() => setActiveTab('all')}>All Results</button>
+            <button className={`tab-btn ${activeTab === 'videos' ? 'active' : ''}`} onClick={() => setActiveTab('videos')}>Videos ({results.videos.length})</button>
+            <button className={`tab-btn ${activeTab === 'docs' ? 'active' : ''}`} onClick={() => setActiveTab('docs')}>Documentation ({results.docs.length})</button>
+          </div>
+        )}
       </div>
 
       <div className="youtube-content">
-        {loading ? (
-          <div className="loading-grid">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="video-skeleton">
-                <div className="skeleton-thumb"></div>
-                <div className="skeleton-title"></div>
-                <div className="skeleton-text"></div>
-              </div>
-            ))}
+        {!hasSearched && !loading ? (
+           <div className="empty-state">
+             <h2>Search anything to start learning</h2>
+             <p>Access an AI-curated ecosystem of top-tier tutorials and official documentation.</p>
+           </div>
+        ) : loading ? (
+          <div className="loading-state-wrapper">
+            <div className="simple-loader"></div>
+            <p className="searching-text">Searching across resources...</p>
           </div>
-        ) : videos.length > 0 ? (
-          <div className="video-grid">
-            {videos.map((video) => (
-              <div key={video.videoId} className="video-card">
-                <div className="video-thumb-container">
-                  <img 
-                    src={video.thumbnail} 
-                    alt={video.title} 
-                    className="video-thumb" 
-                    onError={(e) => {
-                      const fallback = `https://i.ytimg.com/vi/${video.videoId}/default.jpg`;
-                      if (e.target.src !== fallback) {
-                        e.target.src = fallback;
-                      } else {
-                        e.target.onerror = null;
-                        e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180"><rect fill="%231a1a2e" width="320" height="180"/><text x="50%" y="50%" fill="%23555" font-size="14" text-anchor="middle" dy=".3em">No Preview</text></svg>';
-                      }
-                    }}
-                  />
-                  <span className="video-duration">{formatDuration(video.duration)}</span>
-                </div>
-                
-                <div className="video-info">
-                  <h3 className="video-card-title">{video.title}</h3>
-                  <div className="video-meta">
-                    <span className="video-channel">{video.channelTitle}</span>
-                    <span className="video-dot">•</span>
-                    <span className="video-views">{formatViews(video.views)} views</span>
-                  </div>
-                  
-                  <div className="video-actions">
-                    <button 
-                      className="btn-watch" 
-                      onClick={() => navigate(`/tutorial/${video.videoId}`, { state: { video } })}
-                    >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                      Watch
-                    </button>
-                    <button 
-                      className="btn-quiz" 
-                      onClick={() => setQuizOpts({ isOpen: true, video })}
-                    >
-                      Generate Quiz
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+        ) : hasEmptyResults ? (
+          <div className="empty-state">
+            <h2>Search anything to start learning</h2>
+            <p>No content found. Please try tweaking your keywords.</p>
           </div>
         ) : (
-          <div className="empty-state">
-            <h2>No tutorials found</h2>
-            <p>Try searching for a different topic.</p>
+          <div className="search-results-layout">
+            
+            {/* ── Videos Section (Carousel) ── */}
+            {(activeTab === 'all' || activeTab === 'videos') && results.videos.length > 0 && (
+              <div className="resource-section">
+                <div className="section-header">
+                  <h2 className="section-title">Videos</h2>
+                  <button className="view-all-btn" onClick={() => setActiveTab('videos')}>
+                    View All &rsaquo;
+                  </button>
+                </div>
+                
+                <div className="carousel-wrapper">
+                  <button className="carousel-btn carousel-btn-left" onClick={() => scrollCarousel('left')} aria-label="Scroll left">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                  </button>
+                  
+                  <div className="video-carousel" ref={videoCarouselRef}>
+                    {results.videos.map((video) => (
+                      <div key={video.videoId} className="video-card">
+                        <div className="video-thumb-container">
+                          <img 
+                            src={video.thumbnail} 
+                            alt={video.title} 
+                            className="video-thumb" 
+                            onError={(e) => {
+                              const fallback = `https://i.ytimg.com/vi/${video.videoId}/default.jpg`;
+                              if (e.target.src !== fallback) {
+                                e.target.src = fallback;
+                              } else {
+                                e.target.onerror = null;
+                                e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180"><rect fill="%231a1a2e" width="320" height="180"/><text x="50%" y="50%" fill="%23555" font-size="14" text-anchor="middle" dy=".3em">No Preview</text></svg>';
+                              }
+                            }}
+                          />
+                          <span className="video-duration">{formatDuration(video.duration)}</span>
+                        </div>
+                        
+                        <div className="video-info">
+                          <h3 className="video-card-title">{video.title}</h3>
+                          <div className="video-meta">
+                            <span className="video-channel">{video.channelTitle}</span>
+                            <span className="video-dot">•</span>
+                            <span className="video-views">{formatViews(video.views)} views</span>
+                          </div>
+                          
+                          <div className="video-actions">
+                            <button 
+                              className="btn-watch" 
+                              onClick={() => navigate(`/tutorial/${video.videoId}`, { state: { video } })}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M8 5v14l11-7z" />
+                              </svg>
+                              Watch
+                            </button>
+                            <button 
+                              className="btn-quiz" 
+                              onClick={() => setQuizOpts({ isOpen: true, video })}
+                            >
+                              Generate Quiz
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <button className="carousel-btn carousel-btn-right" onClick={() => scrollCarousel('right')} aria-label="Scroll right">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ── Documentation Section ── */}
+            {(activeTab === 'all' || activeTab === 'docs') && results.docs && results.docs.length > 0 && (
+              <div className="resource-section">
+                <div className="section-header">
+                  <h2 className="section-title">Documentation</h2>
+                  <button className="view-all-btn" onClick={() => setActiveTab('docs')}>
+                    View All &rsaquo;
+                  </button>
+                </div>
+                <div className="resource-grid">
+                  {results.docs.map((item, index) => (
+                    <ResourceCard 
+                      key={index}
+                      title={item.title}
+                      snippet={item.snippet}
+                      link={item.link}
+                      source={item.source}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
           </div>
         )}
       </div>
