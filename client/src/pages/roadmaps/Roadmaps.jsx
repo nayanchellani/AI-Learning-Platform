@@ -3,13 +3,30 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Roadmaps.css';
 
+const CATEGORIES = [
+  "Web Development", "Mobile Development", "Data Science", "Machine Learning",
+  "DevOps", "Cybersecurity", "Game Development", "Desktop Applications",
+  "API Development", "Database Design", "UI/UX Design", "Cloud Computing"
+];
+
 const Roadmaps = () => {
-  const [topic, setTopic] = useState('');
   const [myRoadmaps, setMyRoadmaps] = useState([]);
   const [publicRoadmaps, setPublicRoadmaps] = useState([]);
-  const [generating, setGenerating] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('my');
+  const [showModal, setShowModal] = useState(false);
+  const [generating, setGenerating] = useState(false);
+
+  // Form state
+  const [form, setForm] = useState({
+    title: '',
+    category: '',
+    level: 'beginner',
+    timeCommitment: 'moderate',
+    learningGoals: []
+  });
+  const [goalInput, setGoalInput] = useState('');
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,17 +51,52 @@ const Roadmaps = () => {
 
   const handleGenerate = async (e) => {
     e.preventDefault();
-    if (!topic.trim() || generating) return;
+    if (!form.title.trim() || !form.category || generating) return;
 
     setGenerating(true);
     try {
-      const res = await axios.post('/api/roadmaps/generate', { topic: topic.trim() });
+      const res = await axios.post('/api/roadmaps/generate', {
+        title: form.title.trim(),
+        category: form.category,
+        level: form.level,
+        timeCommitment: form.timeCommitment,
+        learningGoals: form.learningGoals
+      });
+      setShowModal(false);
       navigate(`/roadmaps/${res.data._id}`);
     } catch (err) {
       console.error('Failed to generate roadmap:', err);
     } finally {
       setGenerating(false);
     }
+  };
+
+  const addGoal = () => {
+    if (goalInput.trim() && form.learningGoals.length < 5) {
+      setForm({ ...form, learningGoals: [...form.learningGoals, goalInput.trim()] });
+      setGoalInput('');
+    }
+  };
+
+  const removeGoal = (index) => {
+    setForm({ ...form, learningGoals: form.learningGoals.filter((_, i) => i !== index) });
+  };
+
+  const handleClone = async (roadmapId) => {
+    try {
+      const res = await axios.post(`/api/roadmaps/${roadmapId}/clone`);
+      navigate(`/roadmaps/${res.data._id}`);
+    } catch (err) {
+      if (err.response?.data?.roadmapId) {
+        navigate(`/roadmaps/${err.response.data.roadmapId}`);
+      }
+    }
+  };
+
+  const openModal = () => {
+    setForm({ title: '', category: '', level: 'beginner', timeCommitment: 'moderate', learningGoals: [] });
+    setGoalInput('');
+    setShowModal(true);
   };
 
   const getLevelColor = (level) => {
@@ -56,106 +108,249 @@ const Roadmaps = () => {
     }
   };
 
-  const formatDate = (dateStr) => {
-    const d = new Date(dateStr);
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const getProgress = (rm) => {
+    const total = rm.nodeCount || rm.nodes?.length || 0;
+    const completed = rm.completedNodes?.length || 0;
+    return total > 0 ? Math.round((completed / total) * 100) : 0;
   };
 
   const displayedRoadmaps = activeTab === 'my' ? myRoadmaps : publicRoadmaps;
 
   return (
     <div className="roadmaps-page">
-
-      {/* Hero / Generate Section */}
-      <div className="roadmaps-hero">
-        <h1 className="roadmaps-title">Roadmaps</h1>
-        <p className="roadmaps-subtitle">Generate an AI-powered learning roadmap with curated video recommendations for any topic.</p>
-        
-        <form onSubmit={handleGenerate} className="generate-form">
-          <div className="generate-input-wrapper">
-            <input
-              type="text"
-              className="generate-input"
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-              placeholder="What do you want to learn? (e.g., Machine Learning, React, DSA...)"
-              disabled={generating}
-            />
-            <button type="submit" className="generate-btn" disabled={generating || !topic.trim()}>
-              {generating ? (
-                <span className="generate-spinner"></span>
-              ) : (
-                'Generate Roadmap'
-              )}
-            </button>
-          </div>
-        </form>
-
-        {generating && (
-          <div className="generating-status">
-            <div className="generating-loader"></div>
-            <p>Generating your roadmap & finding curated videos...</p>
-            <span className="generating-hint">This may take 15-30 seconds</span>
-          </div>
-        )}
+      {/* Header */}
+      <div className="rm-header">
+        <div>
+          <h1 className="rm-page-title">Learning Roadmaps</h1>
+          <p className="rm-page-subtitle">Follow structured learning paths tailored to your goals</p>
+        </div>
+        <button className="rm-create-btn" onClick={openModal}>+ Create Roadmap</button>
       </div>
 
       {/* Tabs */}
-      <div className="roadmaps-tabs">
-        <button
-          className={`roadmap-tab ${activeTab === 'my' ? 'active' : ''}`}
-          onClick={() => setActiveTab('my')}
-        >
+      <div className="rm-tabs">
+        <button className={`rm-tab ${activeTab === 'my' ? 'active' : ''}`} onClick={() => setActiveTab('my')}>
           My Roadmaps ({myRoadmaps.length})
         </button>
-        <button
-          className={`roadmap-tab ${activeTab === 'public' ? 'active' : ''}`}
-          onClick={() => setActiveTab('public')}
-        >
-          Discover ({publicRoadmaps.length})
+        <button className={`rm-tab ${activeTab === 'public' ? 'active' : ''}`} onClick={() => setActiveTab('public')}>
+          Browse Public ({publicRoadmaps.length})
         </button>
       </div>
 
       {/* Roadmap Cards */}
-      <div className="roadmaps-content">
+      <div className="rm-content">
         {loading ? (
-          <div className="roadmaps-loading">
-            <div className="simple-loader"></div>
+          <div className="rm-loading">
+            <div className="rm-spinner"></div>
             <p>Loading roadmaps...</p>
           </div>
         ) : displayedRoadmaps.length === 0 ? (
-          <div className="roadmaps-empty">
+          <div className="rm-empty">
             <h3>{activeTab === 'my' ? 'No roadmaps yet' : 'No public roadmaps found'}</h3>
-            <p>{activeTab === 'my' ? 'Generate your first roadmap above!' : 'Be the first to generate and share a roadmap.'}</p>
+            <p>{activeTab === 'my' ? 'Create your first learning roadmap!' : 'Be the first to share a roadmap.'}</p>
           </div>
         ) : (
-          <div className="roadmaps-grid">
-            {displayedRoadmaps.map((roadmap) => (
-              <div
-                key={roadmap._id}
-                className="roadmap-card"
-                onClick={() => navigate(`/roadmaps/${roadmap._id}`)}
-              >
-                <div className="roadmap-card-header">
-                  <span
-                    className="level-pill"
-                    style={{ backgroundColor: `${getLevelColor(roadmap.level)}20`, color: getLevelColor(roadmap.level) }}
-                  >
-                    {roadmap.level}
-                  </span>
-                  <span className="node-count">{roadmap.nodeCount || roadmap.nodes?.length || 0} steps</span>
+          <div className="rm-grid">
+            {displayedRoadmaps.map((rm) => {
+              const progress = getProgress(rm);
+              const nodeCount = rm.nodeCount || rm.nodes?.length || 0;
+              const isOwn = activeTab === 'my';
+              return (
+                <div key={rm._id} className="rm-card">
+                  <div className="rm-card-top">
+                    <h3 className="rm-card-title">{rm.title}</h3>
+                    <div className="rm-card-badges">
+                      <span className="rm-badge-level" style={{ backgroundColor: getLevelColor(rm.level) }}>
+                        {rm.level?.toUpperCase()}
+                      </span>
+                      {rm.category && (
+                        <span className="rm-badge-category">{rm.category}</span>
+                      )}
+                    </div>
+                  </div>
+                  <p className="rm-card-desc">{rm.description}</p>
+
+                  {isOwn && (
+                    <div className="rm-card-progress">
+                      <div className="rm-progress-header">
+                        <span>Progress: {progress}%</span>
+                        <span className="rm-nodes-avail">{nodeCount - (rm.completedNodes?.length || 0)} nodes available</span>
+                      </div>
+                      <div className="rm-progress-bg">
+                        <div className="rm-progress-fill" style={{ width: `${progress}%` }}></div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="rm-card-stats">
+                    <div className="rm-stat">
+                      <span className="rm-stat-val">{nodeCount}</span>
+                      <span className="rm-stat-lbl">Nodes</span>
+                    </div>
+                    {rm.createdBy?.username && !isOwn && (
+                      <div className="rm-stat">
+                        <span className="rm-stat-val">{rm.createdBy.username}</span>
+                        <span className="rm-stat-lbl">Author</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {isOwn ? (
+                    <button className="rm-continue-btn" onClick={() => navigate(`/roadmaps/${rm._id}`)}>
+                      Continue Learning
+                    </button>
+                  ) : (
+                    <div className="rm-public-actions">
+                      <button className="rm-view-btn" onClick={() => navigate(`/roadmaps/${rm._id}`)}>
+                        View Roadmap
+                      </button>
+                      <button className="rm-add-btn" onClick={() => handleClone(rm._id)}>
+                        Add to My Roadmaps
+                      </button>
+                    </div>
+                  )}
                 </div>
-                <h3 className="roadmap-card-title">{roadmap.title}</h3>
-                <p className="roadmap-card-desc">{roadmap.description}</p>
-                <div className="roadmap-card-footer">
-                  <span className="roadmap-date">{formatDate(roadmap.createdAt)}</span>
-                  <span className="roadmap-view-btn">View &rsaquo;</span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
+
+      {/* ── Create Roadmap Modal ── */}
+      {showModal && (
+        <div className="rm-modal-overlay" onClick={() => !generating && setShowModal(false)}>
+          <div className="rm-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="rm-modal-header">
+              <h2>Create Learning Roadmap</h2>
+              <button className="rm-modal-close" onClick={() => !generating && setShowModal(false)}>&times;</button>
+            </div>
+
+            <form onSubmit={handleGenerate} className="rm-modal-form">
+              {/* Title */}
+              <label className="rm-label">Roadmap Title <span className="rm-req">*</span></label>
+              <input
+                type="text"
+                className="rm-input"
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                placeholder="e.g., Full Stack JavaScript Development"
+                disabled={generating}
+              />
+
+              {/* Category */}
+              <label className="rm-label">Category <span className="rm-req">*</span></label>
+              <select
+                className="rm-select"
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                disabled={generating}
+              >
+                <option value="">Select a category</option>
+                {CATEGORIES.map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+
+              {/* Skill Level */}
+              <label className="rm-label">Skill Level <span className="rm-req">*</span></label>
+              <div className="rm-radio-group">
+                {[
+                  { value: 'beginner', label: 'Beginner', sub: 'New to programming' },
+                  { value: 'intermediate', label: 'Intermediate', sub: 'Some experience' },
+                  { value: 'advanced', label: 'Advanced', sub: 'Experienced developer' }
+                ].map(opt => (
+                  <label key={opt.value} className={`rm-radio-card ${form.level === opt.value ? 'selected' : ''}`}>
+                    <input
+                      type="radio"
+                      name="level"
+                      value={opt.value}
+                      checked={form.level === opt.value}
+                      onChange={(e) => setForm({ ...form, level: e.target.value })}
+                      disabled={generating}
+                    />
+                    <div>
+                      <strong>{opt.label}</strong>
+                      <span>{opt.sub}</span>
+                    </div>
+                  </label>
+                ))}
+              </div>
+
+              {/* Time Commitment */}
+              <label className="rm-label">Time Commitment</label>
+              <div className="rm-radio-group">
+                {[
+                  { value: 'light', label: 'Light', sub: '1-2 hours/week' },
+                  { value: 'moderate', label: 'Moderate', sub: '3-5 hours/week' },
+                  { value: 'intensive', label: 'Intensive', sub: '6+ hours/week' }
+                ].map(opt => (
+                  <label key={opt.value} className={`rm-radio-card ${form.timeCommitment === opt.value ? 'selected' : ''}`}>
+                    <input
+                      type="radio"
+                      name="timeCommitment"
+                      value={opt.value}
+                      checked={form.timeCommitment === opt.value}
+                      onChange={(e) => setForm({ ...form, timeCommitment: e.target.value })}
+                      disabled={generating}
+                    />
+                    <div>
+                      <strong>{opt.label}</strong>
+                      <span>{opt.sub}</span>
+                    </div>
+                  </label>
+                ))}
+              </div>
+
+              {/* Learning Goals */}
+              <label className="rm-label">Learning Goals</label>
+              <div className="rm-goals-input">
+                <input
+                  type="text"
+                  className="rm-input"
+                  value={goalInput}
+                  onChange={(e) => setGoalInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addGoal())}
+                  placeholder="Add a learning goal (e.g., Build REST APIs)"
+                  disabled={generating}
+                />
+                <button type="button" className="rm-goal-add-btn" onClick={addGoal} disabled={generating}>Add</button>
+              </div>
+              {form.learningGoals.length > 0 && (
+                <div className="rm-goals-tags">
+                  {form.learningGoals.map((goal, i) => (
+                    <span key={i} className="rm-goal-tag">
+                      {goal}
+                      <button type="button" onClick={() => removeGoal(i)}>&times;</button>
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="rm-modal-footer">
+                <button type="button" className="rm-cancel-btn" onClick={() => setShowModal(false)} disabled={generating}>Cancel</button>
+                <button type="submit" className="rm-submit-btn" disabled={generating || !form.title.trim() || !form.category}>
+                  {generating ? (
+                    <>
+                      <span className="rm-btn-spinner"></span>
+                      Generating...
+                    </>
+                  ) : 'Create Roadmap'}
+                </button>
+              </div>
+
+              {/* AI info */}
+              <div className="rm-ai-info">
+                <span className="rm-ai-icon">✦</span>
+                <div>
+                  <strong>AI-Generated Content</strong>
+                  <p>Our AI will create a personalized learning path with curated resources, practice exercises, and milestone projects based on your preferences.</p>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

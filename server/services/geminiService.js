@@ -69,13 +69,27 @@ Rules:
     }
 };
 
-export const generateRoadmapAI = async (topic) => {
+export const generateRoadmapAI = async ({ title, category, level, timeCommitment, learningGoals }) => {
     try {
-        const prompt = `Create a structured learning roadmap for "${topic}".
+        const goalsText = learningGoals && learningGoals.length > 0
+            ? `The learner's specific goals are: ${learningGoals.join(", ")}.`
+            : "";
+
+        const commitmentMap = {
+            light: "1-2 hours per week (light)",
+            moderate: "3-5 hours per week (moderate)",
+            intensive: "6+ hours per week (intensive)"
+        };
+        const commitmentText = commitmentMap[timeCommitment] || commitmentMap.moderate;
+
+        const prompt = `Create a structured learning roadmap for "${title}" in the "${category}" domain.
+        The learner is at "${level}" level and can commit ${commitmentText}.
+        ${goalsText}
+        
         Return strictly in JSON format with these fields:
-        - title: (string, e.g. "Machine Learning Roadmap")
-        - description: (string, 2-3 sentence overview of what the learner will achieve)
-        - level: (string, one of: "beginner", "intermediate", "advanced" — pick the most appropriate)
+        - title: (string, the roadmap title)
+        - description: (string, 2-3 sentence overview tailored to the learner's level and goals)
+        - level: "${level}"
         - nodes: (array of 8-12 objects, each representing a learning step IN ORDER)
           Each node must have:
           - id: (unique string like "node_1", "node_2", etc.)
@@ -84,6 +98,7 @@ export const generateRoadmapAI = async (topic) => {
           - type: (string, either "video" or "article")
           - order: (number, starting from 1)
         
+        Tailor the depth, pace, and complexity to the "${level}" skill level and "${timeCommitment}" time commitment.
         Make the roadmap practical and progressive — each step builds on the previous.
         Do NOT include any markdown formatting or code blocks, return ONLY the raw JSON object.`;
 

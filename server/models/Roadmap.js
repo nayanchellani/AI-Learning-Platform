@@ -22,23 +22,34 @@ const nodeSchema = new mongoose.Schema({
 const roadmapSchema = new mongoose.Schema({
     title: String,
     description: String,
+    category: {
+        type: String,
+        required: true
+    },
     level: {
         type: String,
         enum: ["beginner", "intermediate", "advanced"],
         default: "beginner"
     },
+    timeCommitment: {
+        type: String,
+        enum: ["light", "moderate", "intensive"],
+        default: "moderate"
+    },
+    learningGoals: [String],
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
     },
     isPublic: {
         type: Boolean,
-        default: true
+        default: false
     },
     nodes: [nodeSchema],
-    saves: {
-        type: Number,
-        default: 0
+    completedNodes: [String],
+    clonedFrom: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Roadmap"
     }
 }, { timestamps: true });
 

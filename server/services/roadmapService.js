@@ -3,16 +3,50 @@ import { generateRoadmapAI } from "./geminiService.js";
 import { searchVideos } from "./youtubeService.js";
 
 /**
- * Search YouTube for a single best video for a roadmap node topic.
- * Returns the top result or null.
+ * Generate a roadmap via AI (no YouTube videos on creation — lazy loaded).
  */
-const findVideoForNode = async (nodeTitle, roadmapTopic) => {
+export const createRoadmap = async (userId, { title, category, level, timeCommitment, learningGoals }) => {
+    const aiData = await generateRoadmapAI({ title, category, level, timeCommitment, learningGoals });
+
+    const roadmap = await Roadmap.create({
+        title: aiData.title || title,
+        description: aiData.description,
+        category,
+        level: level || aiData.level || "beginner",
+        timeCommitment: timeCommitment || "moderate",
+        learningGoals: learningGoals || [],
+        createdBy: userId,
+        isPublic: false,
+        nodes: aiData.nodes || [],
+        completedNodes: []
+    });
+
+    return roadmap;
+};
+
+/**
+ * Fetch a curated YouTube video for a specific node (lazy loading).
+ */
+export const fetchVideoForNode = async (roadmapId, nodeId) => {
+    const roadmap = await Roadmap.findById(roadmapId);
+    if (!roadmap) throw new Error("Roadmap not found");
+
+    const node = roadmap.nodes.find(n => n.id === nodeId);
+    if (!node) throw new Error("Node not found");
+
+    // If video already cached, return it
+    if (node.video && node.video.videoId) {
+        return node.video;
+    }
+
+    // Search YouTube for this node's topic
     try {
-        const query = `${nodeTitle} ${roadmapTopic} tutorial`;
+        const query = `${node.title} ${roadmap.title} tutorial`;
         const videos = await searchVideos(query, 1);
+
         if (videos && videos.length > 0) {
             const v = videos[0];
-            return {
+            const videoData = {
                 videoId: v.videoId,
                 title: v.title,
                 thumbnail: v.thumbnail,
@@ -20,49 +54,16 @@ const findVideoForNode = async (nodeTitle, roadmapTopic) => {
                 duration: v.duration,
                 views: v.views
             };
+
+            // Cache the video on the node
+            node.video = videoData;
+            await roadmap.save();
+
+            return videoData;
         }
-        return null;
     } catch (err) {
-        console.error(`YouTube search failed for node "${nodeTitle}":`, err.message);
-        return null;
-    }
-};
-
-/**
- * Generate a roadmap via AI, then enrich each node with a curated YouTube video.
- */
-export const createRoadmap = async (userId, topic) => {
-    // Step 1: AI generates the roadmap structure
-    const aiData = await generateRoadmapAI(topic);
-
-    // Step 2: For each node, find a curated YouTube video (parallel, max 3 concurrent)
-    const nodes = aiData.nodes || [];
-    const enrichedNodes = [];
-
-    // Process in batches of 3 to avoid hitting API rate limits
-    for (let i = 0; i < nodes.length; i += 3) {
-        const batch = nodes.slice(i, i + 3);
-        const results = await Promise.all(
-            batch.map(async (node) => {
-                const video = await findVideoForNode(node.title, aiData.title);
-                return {
-                    ...node,
-                    video: video || undefined
-                };
-            })
-        );
-        enrichedNodes.push(...results);
+        console.error(`YouTube search failed for node "${node.title}":`, err.message);
     }
 
-    // Step 3: Save to DB
-    const roadmap = await Roadmap.create({
-        title: aiData.title,
-        description: aiData.description,
-        level: aiData.level || "beginner",
-        createdBy: userId,
-        isPublic: true,
-        nodes: enrichedNodes
-    });
-
-    return roadmap;
+    return null;
 };
