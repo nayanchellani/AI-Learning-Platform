@@ -148,8 +148,8 @@ const RoadmapViewer = () => {
   for (let i = 0; i < sortedNodes.length; i += NODES_PER_ROW) {
     const row = sortedNodes.slice(i, i + NODES_PER_ROW);
     const rowIndex = Math.floor(i / NODES_PER_ROW);
-    // Reverse even-indexed rows (after the first) for snake pattern
-    if (rowIndex % 2 === 1) row.reverse();
+    // Only log the reversed status for CSS styling, DON'T reverse the actual array 
+    // since flex-direction: row-reverse handles the visual reversing
     rows.push({ nodes: row, reversed: rowIndex % 2 === 1 });
   }
 
@@ -219,7 +219,7 @@ const RoadmapViewer = () => {
                   const showConnector = nodeIdx < row.nodes.length - 1;
 
                   return (
-                    <div className="rv-flow-item" key={node.id}>
+                    <div key={node.id} style={{ display: 'contents' }}>
                       <div
                         className={`rv-node ${isCompleted ? 'completed' : ''} ${isSelected ? 'selected' : ''}`}
                         onClick={() => selectNode(node)}

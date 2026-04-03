@@ -257,7 +257,8 @@
 
 .rv-node.completed {
   border-color: #4ade80;
-  background: rgba(74, 222, 128, 0.08);
+  background: rgba(74, 222, 128, 0.15);
+  box-shadow: 0 0 16px rgba(74, 222, 128, 0.15);
 }
 
 .rv-node.completed .rv-node-check {
@@ -335,6 +336,17 @@
   border-left: 6px solid rgba(255,192,0,0.5);
 }
 
+.rv-flow-row.reversed .rv-h-connector {
+  background: linear-gradient(270deg, rgba(255,192,0,0.3), rgba(255,192,0,0.5));
+}
+
+.rv-flow-row.reversed .rv-h-connector::after {
+  right: auto;
+  left: -1px;
+  border-left: none;
+  border-right: 6px solid rgba(255,192,0,0.5);
+}
+
 .rv-v-connector-wrap {
   display: flex;
   padding: 0;
@@ -342,12 +354,12 @@
 
 .rv-v-connector-wrap.align-right {
   justify-content: flex-end;
-  padding-right: 75px;
+  padding-right: 73px;
 }
 
 .rv-v-connector-wrap.align-left {
   justify-content: flex-start;
-  padding-left: 75px;
+  padding-left: 73px;
 }
 
 .rv-v-connector {
