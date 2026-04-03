@@ -69,21 +69,23 @@ Rules:
     }
 };
 
-export const generateRoadmap = async (title, category, skillLevel) => {
+export const generateRoadmapAI = async (topic) => {
     try {
-        const prompt = `Create a learning roadmap for "${title}" in the category "${category}" for a "${skillLevel}" level learner.
+        const prompt = `Create a structured learning roadmap for "${topic}".
         Return strictly in JSON format with these fields:
-        - title: (string)
-        - description: (string)
-        - nodes: (array of 8-10 objects)
+        - title: (string, e.g. "Machine Learning Roadmap")
+        - description: (string, 2-3 sentence overview of what the learner will achieve)
+        - level: (string, one of: "beginner", "intermediate", "advanced" — pick the most appropriate)
+        - nodes: (array of 8-12 objects, each representing a learning step IN ORDER)
           Each node must have:
-          - id: (unique string)
-          - title: (string)
-          - description: (string)
-          - type: (enum: video, quiz, project, reading)
-          - estimatedTime: (number in minutes)
-          - difficulty: (string)
-          - dependencies: (array of strings, ids of previous nodes)`;
+          - id: (unique string like "node_1", "node_2", etc.)
+          - title: (string, short topic name like "Introduction to Neural Networks")
+          - description: (string, 2-3 sentences explaining what to learn in this step and why it matters)
+          - type: (string, either "video" or "article")
+          - order: (number, starting from 1)
+        
+        Make the roadmap practical and progressive — each step builds on the previous.
+        Do NOT include any markdown formatting or code blocks, return ONLY the raw JSON object.`;
 
         const result = await getModel().generateContent(prompt);
         const response = await result.response;
