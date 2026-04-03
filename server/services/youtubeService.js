@@ -2,19 +2,38 @@ import axios from "axios";
 
 const YOUTUBE_BASE_URL = "https://www.googleapis.com/youtube/v3";
 
+const MIN_DURATION_SECONDS = 300; // 5 minutes
+
+/**
+ * Parse ISO 8601 duration (e.g. "PT12M30S") to total seconds.
+ */
+const parseDuration = (ptString) => {
+    if (!ptString || ptString === "PT0S") return 0;
+    const match = ptString.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+    if (!match) return 0;
+    const h = parseInt(match[1]) || 0;
+    const m = parseInt(match[2]) || 0;
+    const s = parseInt(match[3]) || 0;
+    return h * 3600 + m * 60 + s;
+};
+
 export const searchVideos = async (query, maxResults = 12) => {
     try {
         const API_KEY = process.env.YOUTUBE_API_KEY;
 
         const preferredChannels = "CodeWithHarry OR Apna College OR Sheryians Coding School OR Programming with Mosh OR Coding with Sagar OR Chai aur Code OR BroCode";
+
+        // Over-fetch to compensate for duration filtering
+        const fetchCount = maxResults * 3;
         
         const searchRes = await axios.get(`${YOUTUBE_BASE_URL}/search`, {
             params: {
                 part: "snippet",
-                q: `${query} tutorial (${preferredChannels}) -movie -trailer -shorts`,
+                q: `${query} tutorial (${preferredChannels}) -movie -trailer -shorts -short`,
                 type: "video",
+                videoDuration: "medium",   // 4-20 min — eliminates Shorts at API level
                 order: "relevance",
-                maxResults,
+                maxResults: fetchCount,
                 key: API_KEY
             }
         });
@@ -32,7 +51,7 @@ export const searchVideos = async (query, maxResults = 12) => {
             }
         });
 
-        return items.map(item => {
+        const allVideos = items.map(item => {
             const details = detailsRes.data.items.find(d => d.id === item.id.videoId);
             return {
                 videoId: item.id.videoId,
@@ -45,6 +64,11 @@ export const searchVideos = async (query, maxResults = 12) => {
                 views: details?.statistics?.viewCount || "0"
             };
         });
+
+        // Filter: only keep videos >= 5 minutes
+        return allVideos
+            .filter(v => parseDuration(v.duration) >= MIN_DURATION_SECONDS)
+            .slice(0, maxResults);
 
     } catch (error) {
         console.error("YouTube Service Error:", error.response?.data || error.message);
