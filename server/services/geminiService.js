@@ -69,21 +69,38 @@ Rules:
     }
 };
 
-export const generateRoadmap = async (title, category, skillLevel) => {
+export const generateRoadmapAI = async ({ title, category, level, timeCommitment, learningGoals }) => {
     try {
-        const prompt = `Create a learning roadmap for "${title}" in the category "${category}" for a "${skillLevel}" level learner.
+        const goalsText = learningGoals && learningGoals.length > 0
+            ? `The learner's specific goals are: ${learningGoals.join(", ")}.`
+            : "";
+
+        const commitmentMap = {
+            light: "1-2 hours per week (light)",
+            moderate: "3-5 hours per week (moderate)",
+            intensive: "6+ hours per week (intensive)"
+        };
+        const commitmentText = commitmentMap[timeCommitment] || commitmentMap.moderate;
+
+        const prompt = `Create a structured learning roadmap for "${title}" in the "${category}" domain.
+        The learner is at "${level}" level and can commit ${commitmentText}.
+        ${goalsText}
+        
         Return strictly in JSON format with these fields:
-        - title: (string)
-        - description: (string)
-        - nodes: (array of 8-10 objects)
+        - title: (string, the roadmap title)
+        - description: (string, 2-3 sentence overview tailored to the learner's level and goals)
+        - level: "${level}"
+        - nodes: (array of 8-12 objects, each representing a learning step IN ORDER)
           Each node must have:
-          - id: (unique string)
-          - title: (string)
-          - description: (string)
-          - type: (enum: video, quiz, project, reading)
-          - estimatedTime: (number in minutes)
-          - difficulty: (string)
-          - dependencies: (array of strings, ids of previous nodes)`;
+          - id: (unique string like "node_1", "node_2", etc.)
+          - title: (string, short topic name like "Introduction to Neural Networks")
+          - description: (string, 2-3 sentences explaining what to learn in this step and why it matters)
+          - type: (string, either "video" or "article")
+          - order: (number, starting from 1)
+        
+        Tailor the depth, pace, and complexity to the "${level}" skill level and "${timeCommitment}" time commitment.
+        Make the roadmap practical and progressive — each step builds on the previous.
+        Do NOT include any markdown formatting or code blocks, return ONLY the raw JSON object.`;
 
         const result = await getModel().generateContent(prompt);
         const response = await result.response;

@@ -13,6 +13,7 @@ import Roadmaps from './pages/roadmaps/Roadmaps';
 import CodeReview from './pages/codereview/CodeReview';
 import YoutubePage from './pages/youtubepage/YoutubePage';
 import YtTutorial from './pages/yttutorial/YtTutorial';
+import RoadmapViewer from './pages/roadmaps/RoadmapViewer';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
 
               <Route path="/roadmaps" element={<Roadmaps />} />
+              <Route path="/roadmaps/:id" element={<RoadmapViewer />} />
               <Route path="/code-review" element={<CodeReview />} />
               <Route path="/youtube" element={<YoutubePage />} />
               <Route path="/tutorial/:id" element={<YtTutorial />} />
