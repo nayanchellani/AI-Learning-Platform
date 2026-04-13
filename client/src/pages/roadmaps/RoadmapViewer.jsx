@@ -236,8 +236,19 @@ const RoadmapViewer = () => {
                 })}
               </div>
               {rowIdx < rows.length - 1 && (
-                <div className={`rv-v-connector-wrap ${row.reversed ? 'align-left' : 'align-right'}`}>
-                  <div className="rv-v-connector"></div>
+                <div className={`rv-slant-connector ${row.reversed ? 'slant-left' : 'slant-right'}`}>
+                  <svg viewBox="0 0 100 80" preserveAspectRatio="none">
+                    <line
+                      x1={row.reversed ? "8.5" : "91.5"}
+                      y1="0"
+                      x2={row.reversed ? "8.5" : "91.5"}
+                      y2="80"
+                      stroke="rgba(255,192,0,0.35)"
+                      strokeWidth="2"
+                      strokeDasharray="6 4"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  </svg>
                 </div>
               )}
             </div>

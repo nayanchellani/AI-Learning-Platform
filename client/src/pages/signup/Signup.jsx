@@ -34,7 +34,6 @@ const Signup = () => {
       <div className="auth-global-header">
         <div className="auth-hero-top-left">
           <div className="auth-hero-logo-shape"></div>
-          <span className="auth-hero-email">/ support@learnflow.ai</span>
         </div>
         <div className="auth-nav-links">
           <a href="#">Features</a>
@@ -68,8 +67,7 @@ const Signup = () => {
 
         <div className="auth-hero-content">
           <div className="auth-hero-stat">
-            <span className="auth-stat-number">10</span>
-            <span className="auth-stat-text">Tools for<br/>Excellence in Learning</span>
+            <span className="auth-stat-text">Everything you need to learn smarter</span>
           </div>
 
           <div className="auth-hero-label">
@@ -82,7 +80,7 @@ const Signup = () => {
           </h1>
 
           <p className="auth-hero-subtitle">
-            AI-powered personalized learning platform
+            Master any skill with AI-guided learning paths
           </p>
 
           <ul className="auth-hero-features">
@@ -108,7 +106,6 @@ const Signup = () => {
 
           <Link to="/login" className="auth-hero-cta">
             Sign In
-            <span className="auth-cta-line"></span>
           </Link>
         </div>
       </div>
@@ -186,7 +183,6 @@ const Signup = () => {
             <div className="auth-actions-row">
               <button type="submit" className="auth-submit-btn">
                 Create Account
-                <span className="auth-btn-line"></span>
               </button>
             </div>
           </form>
@@ -223,6 +219,8 @@ const Signup = () => {
       {/* ── Global Footer ── */}
       <div className="auth-global-footer">
         <div className="auth-footer-left">
+          <span>learnflowai101@gmail.com</span>
+          <span className="auth-footer-divider">|</span>
           <a href="#">Terms & Conditions</a>
           <span className="auth-footer-divider">|</span>
           <a href="#">Privacy Policy</a>
