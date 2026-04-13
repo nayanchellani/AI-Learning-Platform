@@ -187,9 +187,10 @@
   background: var(--bg-secondary);
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 20px;
-  padding: 2rem 2.5rem;
+  padding: 3rem 3.5rem;
   margin-bottom: 1.5rem;
   overflow: hidden;
+  min-height: 350px;
 }
 
 /* Grid / Notebook background */
@@ -210,6 +211,8 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+  width: max-content;
+  margin: 0 auto;
 }
 
 /* Flow row */
@@ -230,20 +233,20 @@
   flex-shrink: 0;
 }
 
-/* ── Node ── */
+/* -- Node -- */
 
 .rv-node {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding: 0.9rem 10px;
+  padding: 1rem 12px;
   background: rgba(255,255,255,0.03);
   border: 2px solid rgba(255,255,255,0.1);
   border-radius: 14px;
   cursor: pointer;
   transition: all 0.25s ease;
-  width: 150px;
+  width: 160px;
   box-sizing: border-box;
   flex-shrink: 0;
   text-align: center;
@@ -325,64 +328,36 @@
 
 /* Connectors */
 .rv-h-connector {
-  width: 32px;
-  height: 2px;
-  background: linear-gradient(90deg, rgba(255,192,0,0.3), rgba(255,192,0,0.5));
+  width: 40px;
+  height: 0;
+  border-top: 2px dashed rgba(255,192,0,0.3);
   flex-shrink: 0;
   position: relative;
 }
 
 .rv-h-connector::after {
-  content: '';
-  position: absolute;
-  right: -1px;
-  top: -4px;
-  border-top: 5px solid transparent;
-  border-bottom: 5px solid transparent;
-  border-left: 6px solid rgba(255,192,0,0.5);
+  display: none;
 }
 
 .rv-flow-row.reversed .rv-h-connector {
-  background: linear-gradient(270deg, rgba(255,192,0,0.3), rgba(255,192,0,0.5));
+  border-top: 2px dashed rgba(255,192,0,0.3);
 }
 
 .rv-flow-row.reversed .rv-h-connector::after {
-  right: auto;
-  left: -1px;
-  border-left: none;
-  border-right: 6px solid rgba(255,192,0,0.5);
+  display: none;
 }
 
-.rv-v-connector-wrap {
-  display: flex;
-  padding: 0;
-}
-
-.rv-v-connector-wrap.align-right {
-  justify-content: flex-end;
-  padding-right: 73px;
-}
-
-.rv-v-connector-wrap.align-left {
-  justify-content: flex-start;
-  padding-left: 73px;
-}
-
-.rv-v-connector {
-  width: 2px;
-  height: 28px;
-  background: linear-gradient(180deg, rgba(255,192,0,0.5), rgba(255,192,0,0.3));
+/* Slanting dotted connector between rows */
+.rv-slant-connector {
+  width: 100%;
+  height: 60px;
   position: relative;
 }
 
-.rv-v-connector::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: -4px;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 6px solid rgba(255,192,0,0.4);
+.rv-slant-connector svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 /* ══════════════════════════════════════
@@ -641,11 +616,11 @@
 
 @media (max-width: 1200px) {
   .rv-node {
-    min-width: 110px;
-    max-width: 130px;
-    padding: 0.75rem 0.8rem;
+    min-width: 120px;
+    max-width: 140px;
+    padding: 0.85rem 0.8rem;
   }
-  .rv-h-connector { width: 22px; }
+  .rv-h-connector { width: 28px; }
 }
 
 @media (max-width: 1024px) {
@@ -670,7 +645,7 @@
     gap: 8px;
   }
   .rv-h-connector { display: none; }
-  .rv-v-connector-wrap { display: none; }
+  .rv-slant-connector { display: none; }
   .rv-node {
     min-width: 100px;
     max-width: 120px;
