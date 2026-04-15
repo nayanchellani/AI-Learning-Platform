@@ -49,7 +49,11 @@ export const smartSearch = async (query) => {
             docs: docs.slice(0, 6),
         };
 
-        SearchCache.create({ query: normalizedQuery, results }).catch(err => console.error("Cache save error:", err));
+        SearchCache.create({ query: normalizedQuery, results }).catch(err => {
+            if (err.code !== 11000) {
+                console.error("Cache save error:", err.message);
+            }
+        });
 
         return results;
 

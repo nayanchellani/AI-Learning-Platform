@@ -9,6 +9,7 @@ const nodeSchema = new mongoose.Schema({
         enum: ["video", "article"]
     },
     order: Number,
+    searchQuery: String,
     video: {
         videoId: String,
         title: String,

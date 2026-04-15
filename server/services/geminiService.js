@@ -13,6 +13,19 @@ const getModel = () => {
     return model;
 };
 
+let roadmapGenAI = null;
+let roadmapModel = null;
+
+const getRoadmapModel = () => {
+    if (!roadmapModel) {
+        const apiKey = process.env.GEMINI_ROADMAP_API_KEY || process.env.GEMINI_API_KEY;
+        console.log("[Gemini] Initializing Roadmap Model with key:", apiKey ? `${apiKey.substring(0, 10)}...` : "MISSING!");
+        roadmapGenAI = new GoogleGenerativeAI(apiKey);
+        roadmapModel = roadmapGenAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    }
+    return roadmapModel;
+};
+
 export const generateQuiz = async (topic, difficulty) => {
     try {
         const prompt = `Create a ${difficulty} difficulty quiz about ${topic}. 
@@ -95,6 +108,7 @@ export const generateRoadmapAI = async ({ title, category, level, timeCommitment
           - id: (unique string like "node_1", "node_2", etc.)
           - title: (string, short topic name like "Introduction to Neural Networks")
           - description: (string, 2-3 sentences explaining what to learn in this step and why it matters)
+          - searchQuery: (string, a highly optimized 3-5 word YouTube search query to find the best specific tutorial for this exact node topic. e.g. instead of 'Variables', use 'Javascript variables let var const tutorial')
           - type: (string, either "video" or "article")
           - order: (number, starting from 1)
         
@@ -102,7 +116,7 @@ export const generateRoadmapAI = async ({ title, category, level, timeCommitment
         Make the roadmap practical and progressive — each step builds on the previous.
         Do NOT include any markdown formatting or code blocks, return ONLY the raw JSON object.`;
 
-        const result = await getModel().generateContent(prompt);
+        const result = await getRoadmapModel().generateContent(prompt);
         const response = await result.response;
         const text = response.text();
 
