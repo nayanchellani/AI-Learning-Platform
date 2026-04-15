@@ -41,8 +41,8 @@ export const fetchVideoForNode = async (roadmapId, nodeId) => {
 
     // Search YouTube for this node's topic
     try {
-        const query = `${node.title} ${roadmap.title} tutorial`;
-        const videos = await searchVideos(query, 1);
+        const query = node.searchQuery || `${node.title} ${roadmap.title} tutorial`;
+        const videos = await searchVideos(query, 1, { isRoadmap: true });
 
         if (videos && videos.length > 0) {
             const v = videos[0];

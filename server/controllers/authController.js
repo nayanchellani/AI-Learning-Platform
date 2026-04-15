@@ -21,9 +21,14 @@ export const registerUser = async (req, res) => {
             return res.status(400).json({ message: "Password must be at least 6 characters" });
         }
 
-        const userExists = await User.findOne({ email });
-        if (userExists) {
-            return res.status(400).json({ message: "User already exists" });
+        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+        if (existingUser) {
+            if (existingUser.email === email) {
+                return res.status(400).json({ message: "Email is already registered" });
+            }
+            if (existingUser.username === username) {
+                return res.status(400).json({ message: "Username is already taken" });
+            }
         }
         const hashedpassword = await bcrypt.hash(password, 10);
         const user = new User({

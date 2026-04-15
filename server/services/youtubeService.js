@@ -66,7 +66,20 @@ const isBroadTopic = (query) => {
  * Build clean query params based on whether the topic is broad or niche.
  * NO channel names are injected into the query — ever.
  */
-const buildSearchParams = (query, fetchCount, apiKey) => {
+const buildSearchParams = (query, fetchCount, apiKey, isRoadmap = false) => {
+    if (isRoadmap) {
+        return {
+            part: "snippet",
+            q: `${query} tutorial programming -movie -trailer -gameplay -reaction -vlog`,
+            type: "video",
+            videoDuration: "any",
+            relevanceLanguage: "en",
+            order: "relevance",
+            maxResults: fetchCount,
+            key: apiKey,
+        };
+    }
+
     const broad = isBroadTopic(query);
 
     if (broad) {
@@ -108,14 +121,14 @@ const buildSearchParams = (query, fetchCount, apiKey) => {
  * 4. Post-filter: duration range [10min, 20hr], title blocklist
  * 5. Post-boost: preferred educational channels get priority sorting
  */
-export const searchVideos = async (query, maxResults = 12) => {
+export const searchVideos = async (query, maxResults = 12, options = { isRoadmap: false }) => {
     try {
         const API_KEY = process.env.YOUTUBE_API_KEY;
 
         // Over-fetch 4x to compensate for aggressive post-filtering
         const fetchCount = Math.min(maxResults * 4, 50);
 
-        const searchParams = buildSearchParams(query, fetchCount, API_KEY);
+        const searchParams = buildSearchParams(query, fetchCount, API_KEY, options.isRoadmap);
 
         const searchRes = await axios.get(`${YOUTUBE_BASE_URL}/search`, {
             params: searchParams
@@ -155,8 +168,9 @@ export const searchVideos = async (query, maxResults = 12) => {
 
         // ── Post-filtering pipeline ──
         const filtered = allVideos.filter(v => {
-            // 1. Duration: must be between 10 min and 20 hours
-            if (v.durationSec < MIN_DURATION_SECONDS) return false;
+            // 1. Duration
+            const minAllowed = options.isRoadmap ? 180 : MIN_DURATION_SECONDS; // 3 mins for roadmaps, 10 mins for normal
+            if (v.durationSec < minAllowed) return false;
             if (v.durationSec > MAX_DURATION_SECONDS) return false;
 
             // 2. Title blocklist: reject gaming/movie/vlog content

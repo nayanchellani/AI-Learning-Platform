@@ -160,7 +160,7 @@ const Quiz = ({ isOpen, onClose, video, initialQuiz }) => {
 
             <div className="results-stats-row">
               <div className="stat-circle-box">
-                <svg width="80" height="80" className="circular-chart">
+                <svg viewBox="0 0 36 36" className="circular-chart">
                   <path className="circle-bg"
                     d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                   />
