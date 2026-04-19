@@ -2,12 +2,9 @@ import axios from "axios";
 
 const YOUTUBE_BASE_URL = "https://www.googleapis.com/youtube/v3";
 
-// ── Duration boundaries ──
-const MIN_DURATION_SECONDS = 600;    // 10 minutes hard minimum
-const MAX_DURATION_SECONDS = 72000;  // 20 hours hard maximum
+const MIN_DURATION_SECONDS = 600;
+const MAX_DURATION_SECONDS = 72000;
 
-// ── Preferred channel IDs (verified) ──
-// Using channelId for post-fetch boosting, NOT injected into search query
 const PREFERRED_CHANNEL_IDS = new Set([
     "UCeVMnSShP_Iviwkknt83cww",  // CodeWithHarry
     "UCBwmMxybNva6P_5VmxjzwqA",  // Apna College
@@ -25,7 +22,6 @@ const PREFERRED_CHANNEL_IDS = new Set([
     "UCVTlvUkGslCV_h-nSAId8Sw",  // LearnCodeOnline (Hitesh Choudhary / Chai aur Code)
 ]);
 
-// ── Blocklist — titles containing any of these words are filtered out ──
 const TITLE_BLOCKLIST = [
     "gameplay", "walkthrough", "playthrough", "let's play", "lets play",
     "movie review", "film review", "web series", "episode", "reaction",
@@ -35,12 +31,8 @@ const TITLE_BLOCKLIST = [
     "live stream", "livestream",
 ];
 
-// Compiled regex from blocklist for fast matching
 const BLOCKLIST_REGEX = new RegExp(TITLE_BLOCKLIST.join("|"), "i");
 
-/**
- * Parse ISO 8601 duration (e.g. "PT1H12M30S") to total seconds.
- */
 const parseDuration = (ptString) => {
     if (!ptString || ptString === "PT0S") return 0;
     const match = ptString.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
@@ -51,21 +43,11 @@ const parseDuration = (ptString) => {
     return h * 3600 + m * 60 + s;
 };
 
-/**
- * Detect if query is a broad/general topic (1-2 words) vs a specific niche query.
- * Broad topics: "react", "python", "system design", "javascript"
- * Niche topics: "react useCallback hook", "python decorators explained", "binary search tree"
- */
 const isBroadTopic = (query) => {
     const words = query.trim().split(/\s+/);
-    // 1-2 words = broad, 3+ words = niche
     return words.length <= 2;
 };
 
-/**
- * Build clean query params based on whether the topic is broad or niche.
- * NO channel names are injected into the query — ever.
- */
 const buildSearchParams = (query, fetchCount, apiKey, isRoadmap = false) => {
     if (isRoadmap) {
         return {
@@ -111,21 +93,10 @@ const buildSearchParams = (query, fetchCount, apiKey, isRoadmap = false) => {
     }
 };
 
-/**
- * Search YouTube for educational programming videos.
- * 
- * Architecture:
- * 1. Detect broad vs niche query → use different videoDuration params
- * 2. Fetch via YouTube Data API (no channel names polluting query)
- * 3. Enrich with contentDetails + statistics
- * 4. Post-filter: duration range [10min, 20hr], title blocklist
- * 5. Post-boost: preferred educational channels get priority sorting
- */
 export const searchVideos = async (query, maxResults = 12, options = { isRoadmap: false }) => {
     try {
         const API_KEY = process.env.YOUTUBE_API_KEY;
 
-        // Over-fetch 4x to compensate for aggressive post-filtering
         const fetchCount = Math.min(maxResults * 4, 50);
 
         const searchParams = buildSearchParams(query, fetchCount, API_KEY, options.isRoadmap);
@@ -137,7 +108,6 @@ export const searchVideos = async (query, maxResults = 12, options = { isRoadmap
         const items = searchRes.data.items;
         if (!items || items.length === 0) return [];
 
-        // Get video IDs for detailed info
         const videoIds = items.map(item => item.id.videoId).join(",");
 
         const detailsRes = await axios.get(`${YOUTUBE_BASE_URL}/videos`, {
@@ -166,32 +136,25 @@ export const searchVideos = async (query, maxResults = 12, options = { isRoadmap
             };
         });
 
-        // ── Post-filtering pipeline ──
         const filtered = allVideos.filter(v => {
-            // 1. Duration
-            const minAllowed = options.isRoadmap ? 180 : MIN_DURATION_SECONDS; // 3 mins for roadmaps, 10 mins for normal
+            const minAllowed = options.isRoadmap ? 180 : MIN_DURATION_SECONDS;
             if (v.durationSec < minAllowed) return false;
             if (v.durationSec > MAX_DURATION_SECONDS) return false;
 
-            // 2. Title blocklist: reject gaming/movie/vlog content
             if (BLOCKLIST_REGEX.test(v.title)) return false;
 
             return true;
         });
 
-        // ── Post-boost: sort preferred channels to top, then by views ──
         const sorted = filtered.sort((a, b) => {
             const aPreferred = PREFERRED_CHANNEL_IDS.has(a.channelId) ? 1 : 0;
             const bPreferred = PREFERRED_CHANNEL_IDS.has(b.channelId) ? 1 : 0;
 
-            // Preferred channels first
             if (aPreferred !== bPreferred) return bPreferred - aPreferred;
 
-            // Then by view count (higher = better for educational content)
             return parseInt(b.views) - parseInt(a.views);
         });
 
-        // Remove internal fields and return
         return sorted.slice(0, maxResults).map(({ durationSec, channelId, ...rest }) => rest);
 
     } catch (error) {

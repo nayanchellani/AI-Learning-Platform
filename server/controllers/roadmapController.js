@@ -82,7 +82,7 @@ export const getRoadmapById = async (req, res) => {
     }
 };
 
-// Toggle roadmap visibility (public/private)
+
 export const toggleVisibility = async (req, res) => {
     try {
         const roadmap = await Roadmap.findById(req.params.id);
@@ -105,7 +105,6 @@ export const toggleVisibility = async (req, res) => {
     }
 };
 
-// Mark a node as complete/incomplete
 export const toggleNodeComplete = async (req, res) => {
     try {
         const { nodeId } = req.body;
@@ -144,7 +143,6 @@ export const toggleNodeComplete = async (req, res) => {
     }
 };
 
-// Clone a public roadmap into user's roadmaps
 export const cloneRoadmap = async (req, res) => {
     try {
         const original = await Roadmap.findById(req.params.id).lean();
@@ -188,7 +186,6 @@ export const cloneRoadmap = async (req, res) => {
     }
 };
 
-// Lazy load video for a specific node
 export const getNodeVideo = async (req, res) => {
     try {
         const { id, nodeId } = req.params;
