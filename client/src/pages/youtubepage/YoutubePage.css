@@ -587,3 +587,110 @@
     min-width: 260px;
   }
 }
+
+/* --------- YouTube Skeleton Loaders --------- */
+
+@keyframes ytShimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.yt-skeleton-grid {
+  display: flex;
+  gap: 1.25rem;
+  overflow: hidden;
+  padding: 4px 0 1.5rem;
+}
+
+.yt-skeleton-card {
+  min-width: 300px;
+  max-width: 320px;
+  flex-shrink: 0;
+  background-color: var(--bg-secondary);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.yt-skeleton-thumb {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+  background-size: 800px 100%;
+  animation: ytShimmer 1.5s infinite linear;
+  position: relative;
+}
+
+.yt-skeleton-duration {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  width: 42px;
+  height: 18px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 6px;
+}
+
+.yt-skeleton-info {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.yt-skeleton-bar {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+  background-size: 800px 100%;
+  animation: ytShimmer 1.5s infinite linear;
+}
+
+.yt-sk-title {
+  width: 90%;
+  height: 14px;
+}
+
+.yt-sk-title-short {
+  width: 60%;
+  height: 14px;
+  margin-bottom: 6px;
+}
+
+.yt-skeleton-meta-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.yt-sk-channel {
+  width: 80px;
+  height: 10px;
+}
+
+.yt-sk-views {
+  width: 60px;
+  height: 10px;
+}
+
+.yt-skeleton-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.yt-sk-btn {
+  flex: 1;
+  height: 38px;
+  border-radius: 12px;
+}
+
+/* --------- Carousel Focus Styles --------- */
+
+.carousel-btn:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(255, 192, 0, 0.2);
+}

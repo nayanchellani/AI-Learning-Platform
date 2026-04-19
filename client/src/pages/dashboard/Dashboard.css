@@ -549,3 +549,17 @@
   .bento-col-center, .bento-wide { grid-column: span 1; }
   .snapshot-row { flex-direction: column; }
 }
+
+/* ── Keyboard Focus Styles ── */
+
+.goal-check.clickable:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(255, 192, 0, 0.15);
+}
+
+.scroll-arrow:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(255, 192, 0, 0.2);
+}

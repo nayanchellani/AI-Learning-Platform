@@ -199,7 +199,15 @@ const Dashboard = () => {
             <div className="goal-list">
               {goals.map((goal, idx) => (
                 <div className="goal-item" key={idx}>
-                  <span className={`goal-check ${goal.done ? 'done' : ''} clickable`} onClick={() => toggleGoal(idx)}></span>
+                  <span
+                    className={`goal-check ${goal.done ? 'done' : ''} clickable`}
+                    onClick={() => toggleGoal(idx)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleGoal(idx); } }}
+                    tabIndex={0}
+                    role="checkbox"
+                    aria-checked={goal.done}
+                    aria-label={`Mark goal: ${goal.text}`}
+                  ></span>
                   <input type="text" className={`goal-input ${goal.done ? 'goal-done-text' : ''}`} value={goal.text} onChange={(e) => updateGoalText(idx, e.target.value)} />
                 </div>
               ))}
@@ -312,7 +320,7 @@ const Dashboard = () => {
           </div>
           {recentVideos.length > 0 ? (
             <div className="watching-carousel-container">
-              <button className="scroll-arrow scroll-left" onClick={scrollLeft}>
+              <button className="scroll-arrow scroll-left" onClick={scrollLeft} aria-label="Scroll left">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
               </button>
               <div className="watching-scroller" ref={scrollerRef}>
@@ -327,7 +335,7 @@ const Dashboard = () => {
                   </div>
                 ))}
               </div>
-              <button className="scroll-arrow scroll-right" onClick={scrollRight}>
+              <button className="scroll-arrow scroll-right" onClick={scrollRight} aria-label="Scroll right">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
               </button>
             </div>

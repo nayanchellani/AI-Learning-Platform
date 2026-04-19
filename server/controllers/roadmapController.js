@@ -1,6 +1,26 @@
 import Roadmap from "../models/Roadmap.js";
 import { createRoadmap, fetchVideoForNode } from "../services/roadmapService.js";
 
+export const deleteRoadmap = async (req, res) => {
+    try {
+        const roadmap = await Roadmap.findById(req.params.id);
+
+        if (!roadmap) {
+            return res.status(404).json({ message: "Roadmap not found" });
+        }
+
+        if (roadmap.createdBy.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: "Not authorized to delete this roadmap" });
+        }
+
+        await Roadmap.findByIdAndDelete(req.params.id);
+        res.json({ message: "Roadmap deleted successfully" });
+    } catch (err) {
+        console.error("Delete Roadmap Error:", err);
+        res.status(500).json({ message: "Failed to delete roadmap" });
+    }
+};
+
 export const generateRoadmap = async (req, res) => {
     try {
         const { title, category, level, timeCommitment, learningGoals } = req.body;

@@ -178,6 +178,14 @@
   background: rgba(255,255,255,0.06);
 }
 
+.rv-menu-delete {
+  color: var(--error) !important;
+}
+
+.rv-menu-delete:hover {
+  background: rgba(239, 68, 68, 0.1) !important;
+}
+
 /* ══════════════════════════════════════
    FLOWCHART AREA
    ══════════════════════════════════════ */

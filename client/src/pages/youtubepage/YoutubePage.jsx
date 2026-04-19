@@ -162,9 +162,33 @@ const YoutubePage = () => {
              <p>Access an AI-curated ecosystem of top-tier tutorials and official documentation.</p>
            </div>
         ) : loading ? (
-          <div className="loading-state-wrapper">
-            <div className="simple-loader"></div>
-            <p className="searching-text">Searching across resources...</p>
+          <div className="search-results-layout">
+            <div className="resource-section">
+              <div className="section-header">
+                <h2 className="section-title">Videos</h2>
+              </div>
+              <div className="yt-skeleton-grid">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="yt-skeleton-card">
+                    <div className="yt-skeleton-thumb">
+                      <div className="yt-skeleton-duration"></div>
+                    </div>
+                    <div className="yt-skeleton-info">
+                      <div className="yt-skeleton-bar yt-sk-title"></div>
+                      <div className="yt-skeleton-bar yt-sk-title-short"></div>
+                      <div className="yt-skeleton-meta-row">
+                        <div className="yt-skeleton-bar yt-sk-channel"></div>
+                        <div className="yt-skeleton-bar yt-sk-views"></div>
+                      </div>
+                      <div className="yt-skeleton-actions">
+                        <div className="yt-skeleton-bar yt-sk-btn"></div>
+                        <div className="yt-skeleton-bar yt-sk-btn"></div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         ) : hasEmptyResults ? (
           <div className="empty-state">
