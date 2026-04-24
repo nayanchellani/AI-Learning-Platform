@@ -26,6 +26,7 @@ const CodeReview = () => {
   const [error, setError] = useState('');
   const [output, setOutput] = useState('');
   const [running, setRunning] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const handleReview = async () => {
     if (!code.trim()) {
@@ -39,6 +40,7 @@ const CodeReview = () => {
     try {
       const res = await axios.post('/api/code/review', { code, language });
       setFeedback(res.data);
+      if (window.innerWidth <= 900) setSheetOpen(true);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to review code');
     } finally {
@@ -120,7 +122,8 @@ const CodeReview = () => {
           </div>
         </div>
 
-        <div className="cr-panel cr-review-panel">
+        <div className={`cr-panel cr-review-panel ${sheetOpen ? 'sheet-open' : ''}`}>
+          <div className="cr-sheet-handle" onClick={() => setSheetOpen(false)}></div>
           <div className="cr-panel-header">
             <span className="cr-panel-title">Code Review</span>
             <button className="cr-review-btn" onClick={handleReview} disabled={loading}>

@@ -525,14 +525,82 @@
 .cr-card-explanation { border-color: rgba(59, 130, 246, 0.1); }
 
 @media (max-width: 900px) {
+  .cr-page {
+    padding: 0;
+    margin: 0;
+    max-width: 100%;
+    min-height: unset;
+    height: 100vh;
+  }
   .cr-split {
     flex-direction: column;
+    height: 100%;
+    margin: 0;
+    gap: 0;
+  }
+  .cr-editor-panel {
+    border-radius: 0;
+    border: none;
+    flex: 1;
+    height: 100%;
   }
   .cr-editor-body {
-    min-height: 280px;
-    max-height: 320px;
+    min-height: auto;
+    max-height: none;
+    height: 100%;
   }
-  .cr-page {
-    padding: 1.5rem 1rem;
+  .cr-output-panel {
+    display: none; /* Hide standard output on mobile to save space, rely on review */
+  }
+  
+  /* Bottom Sheet implementation */
+  .cr-review-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 65vh;
+    z-index: 100;
+    border-radius: 24px 24px 0 0;
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+    background: rgba(18, 20, 25, 0.95);
+    backdrop-filter: blur(16px);
+  }
+  
+  .cr-review-panel.sheet-open {
+    transform: translateY(0);
+  }
+
+  .cr-sheet-handle {
+    display: block;
+    width: 100%;
+    height: 24px;
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .cr-sheet-handle::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.2);
+  }
+  
+  .cr-panel-header {
+    border-bottom: none;
+    padding-top: 0;
+  }
+}
+
+@media (min-width: 901px) {
+  .cr-sheet-handle {
+    display: none;
   }
 }

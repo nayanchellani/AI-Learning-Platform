@@ -565,42 +565,34 @@
     flex-direction: column;
   }
 
-  .auth-hero {
-    padding: 2rem 2rem 1.5rem;
-    min-height: auto;
-  }
-
-  .auth-hero-title {
-    font-size: 2.75rem;
-  }
-
-  .auth-stat-number {
-    font-size: 3rem;
-  }
-
-  .auth-hero-stat {
-    margin-bottom: 1.5rem;
-  }
-
-  .auth-hero-cta {
+  /* Hide the hero, header, and footer completely to focus on the form */
+  .auth-hero,
+  .auth-global-header,
+  .auth-global-footer {
     display: none;
-  }
-
-  .auth-chevrons {
-    display: none;
-  }
-
-  .auth-hero-footer {
-    position: static;
-    margin-top: 1.5rem;
   }
 
   .auth-form-side {
-    padding: 1.5rem;
+    padding: 0;
+    flex: 1;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
   }
 
+  /* Make the card edge-to-edge and vertically centered */
   .auth-card {
-    border-radius: 20px 20px 0 0;
+    border-radius: 0;
     max-width: 100%;
+    min-height: 100vh;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+  }
+  
+  .auth-card-title {
+    font-size: 1.75rem;
   }
 }

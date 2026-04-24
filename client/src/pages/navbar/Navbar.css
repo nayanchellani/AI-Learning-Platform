@@ -154,10 +154,79 @@
   background-color: rgba(255, 255, 255, 0.06);
 }
 
-.dropdown-logout {
-  color: var(--error);
-}
-
 .dropdown-logout:hover {
   background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* ── Mobile Bottom Navigation ── */
+
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(21, 26, 34, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 1000;
+  padding-bottom: env(safe-area-inset-bottom, 0px); /* iPhone notch support */
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 10px 0;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  text-decoration: none;
+  font-family: 'Outfit', sans-serif;
+  gap: 4px;
+}
+
+.bottom-nav-item svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 1.5;
+  transition: all 0.2s ease;
+}
+
+.bottom-nav-item span {
+  font-size: 0.65rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.bottom-nav-item.active {
+  color: var(--accent-gold);
+}
+
+.bottom-nav-item.active svg {
+  stroke-width: 2.2;
+}
+
+@media (max-width: 768px) {
+  .navbar-center,
+  .navbar-profile-wrapper {
+    display: none;
+  }
+  
+  .navbar-inner {
+    justify-content: center; /* Center logo when only logo is present */
+    padding: 0.8rem 1.25rem;
+  }
+
+  .mobile-bottom-nav {
+    display: flex;
+  }
+  
+  /* Add padding to the whole body so content isn't hidden behind the bottom bar */
+  body {
+    padding-bottom: 70px; 
+  }
 }
