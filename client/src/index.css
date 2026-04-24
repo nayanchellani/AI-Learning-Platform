@@ -55,3 +55,36 @@ button {
   font-family: 'Inter', sans-serif;
   cursor: pointer;
 }
+
+/* ── Global Keyboard Focus Styles ── */
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 0px;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* ── Selection Color ── */
+
+::selection {
+  background: rgba(255, 255, 255, 0.2);
+  color: inherit;
+}

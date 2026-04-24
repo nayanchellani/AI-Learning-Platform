@@ -8,7 +8,8 @@ import {
     toggleVisibility,
     toggleNodeComplete,
     cloneRoadmap,
-    getNodeVideo
+    getNodeVideo,
+    deleteRoadmap
 } from "../controllers/roadmapController.js";
 
 const router = express.Router();
@@ -20,6 +21,7 @@ router.get("/:id", getRoadmapById);
 router.patch("/:id/visibility", protect, toggleVisibility);
 router.post("/:id/complete-node", protect, toggleNodeComplete);
 router.post("/:id/clone", protect, cloneRoadmap);
+router.delete("/:id", protect, deleteRoadmap);
 router.get("/:id/node/:nodeId/video", getNodeVideo);
 
 export default router;

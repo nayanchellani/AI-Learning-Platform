@@ -1,6 +1,26 @@
 import Roadmap from "../models/Roadmap.js";
 import { createRoadmap, fetchVideoForNode } from "../services/roadmapService.js";
 
+export const deleteRoadmap = async (req, res) => {
+    try {
+        const roadmap = await Roadmap.findById(req.params.id);
+
+        if (!roadmap) {
+            return res.status(404).json({ message: "Roadmap not found" });
+        }
+
+        if (roadmap.createdBy.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: "Not authorized to delete this roadmap" });
+        }
+
+        await Roadmap.findByIdAndDelete(req.params.id);
+        res.json({ message: "Roadmap deleted successfully" });
+    } catch (err) {
+        console.error("Delete Roadmap Error:", err);
+        res.status(500).json({ message: "Failed to delete roadmap" });
+    }
+};
+
 export const generateRoadmap = async (req, res) => {
     try {
         const { title, category, level, timeCommitment, learningGoals } = req.body;
@@ -82,7 +102,7 @@ export const getRoadmapById = async (req, res) => {
     }
 };
 
-// Toggle roadmap visibility (public/private)
+
 export const toggleVisibility = async (req, res) => {
     try {
         const roadmap = await Roadmap.findById(req.params.id);
@@ -105,7 +125,6 @@ export const toggleVisibility = async (req, res) => {
     }
 };
 
-// Mark a node as complete/incomplete
 export const toggleNodeComplete = async (req, res) => {
     try {
         const { nodeId } = req.body;
@@ -144,7 +163,6 @@ export const toggleNodeComplete = async (req, res) => {
     }
 };
 
-// Clone a public roadmap into user's roadmaps
 export const cloneRoadmap = async (req, res) => {
     try {
         const original = await Roadmap.findById(req.params.id).lean();
@@ -188,7 +206,6 @@ export const cloneRoadmap = async (req, res) => {
     }
 };
 
-// Lazy load video for a specific node
 export const getNodeVideo = async (req, res) => {
     try {
         const { id, nodeId } = req.params;

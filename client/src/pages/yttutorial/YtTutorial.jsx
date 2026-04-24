@@ -29,6 +29,16 @@ const YtTutorial = () => {
     }
   }, [video, navigate]);
 
+  // Escape key navigates back
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') navigate(-1);
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [navigate]);
+
+
   const parseDuration = (ptString) => {
     if (!ptString) return 0;
     if (typeof ptString === 'number') return ptString;

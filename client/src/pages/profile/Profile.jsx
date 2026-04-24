@@ -32,6 +32,16 @@ const Profile = ({ isOpen, onClose }) => {
     fetchProfile();
   }, [isOpen]);
 
+  // Escape key closes the profile modal
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
+
 
   const handleLogout = async () => {
     toast.success("Logged out successfully");
@@ -117,7 +127,7 @@ const Profile = ({ isOpen, onClose }) => {
 
   return (
     <div className="profile-overlay" onClick={onClose}>
-      <button className="profile-close-btn" onClick={onClose}>×</button>
+      <button className="profile-close-btn" onClick={onClose} aria-label="Close profile">×</button>
     <div className="profile-page" onClick={(e) => e.stopPropagation()}>
       <div className="profile-container">
         

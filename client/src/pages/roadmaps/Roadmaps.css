@@ -423,7 +423,7 @@
 }
 
 .rm-input:focus {
-  border-color: var(--accent-gold);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .rm-input::placeholder {
@@ -449,7 +449,7 @@
 }
 
 .rm-select:focus {
-  border-color: var(--accent-gold);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .rm-select option {
@@ -664,18 +664,82 @@
 /* ── Responsive ── */
 
 @media (max-width: 768px) {
+  .roadmaps-page {
+    padding: 1rem;
+  }
+
   .rm-header {
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.75rem;
   }
+
+  .rm-page-title {
+    font-size: 1.75rem;
+  }
+
+  .rm-create-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .rm-tabs {
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    gap: 0;
+  }
+
+  .rm-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rm-tab {
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 10px 16px;
+    font-size: 0.88rem;
+  }
+
   .rm-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
+
+  .rm-card {
+    padding: 1.25rem;
+  }
+
+  .rm-card-title {
+    font-size: 1rem;
+  }
+
+  .rm-card-stats {
+    gap: 1.25rem;
+  }
+
   .rm-modal {
-    margin: 1rem;
-    max-height: 90vh;
+    margin: 0;
+    max-height: 100vh;
+    height: 100vh;
+    border-radius: 0;
+    border: none;
   }
+
   .rm-modal-form {
     padding: 1rem 1.25rem 1.25rem;
+  }
+
+  .rm-goals-input {
+    flex-direction: column;
+  }
+
+  .rm-modal-footer {
+    flex-direction: column;
+  }
+
+  .rm-cancel-btn,
+  .rm-submit-btn {
+    width: 100%;
+    justify-content: center;
   }
 }

@@ -42,6 +42,16 @@ const RoadmapViewer = () => {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
+  // Escape key navigates back to roadmaps
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') navigate('/roadmaps');
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [navigate]);
+
+
   const selectNode = async (node) => {
     setSelectedNode(node);
     setNodeVideo(null);
@@ -90,6 +100,16 @@ const RoadmapViewer = () => {
       setMenuOpen(false);
     } catch (err) {
       console.error('Failed to toggle visibility:', err);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this roadmap? This action cannot be undone.')) return;
+    try {
+      await axios.delete(`/api/roadmaps/${id}`);
+      navigate('/roadmaps');
+    } catch (err) {
+      console.error('Failed to delete roadmap:', err);
     }
   };
 
@@ -199,6 +219,11 @@ const RoadmapViewer = () => {
                 )}
                 {!isOwner && (
                   <button onClick={handleClone}>Add to My Roadmaps</button>
+                )}
+                {isOwner && (
+                  <button className="rv-menu-delete" onClick={handleDelete}>
+                    Delete Roadmap
+                  </button>
                 )}
               </div>
             )}

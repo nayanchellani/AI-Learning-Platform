@@ -116,43 +116,45 @@ const YoutubePage = () => {
         <h1 className="youtube-title">Search</h1>
         <p className="youtube-subtitle">Find the best YouTube videos and documentation curated specifically for your learning journey.</p>
         
-        <form onSubmit={handleSearch} className="search-container">
-          <div className="search-input-wrapper">
-            <input 
-              type="text" 
-              className="search-input"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={typingPlaceholder || "Search for tutorials (e.g., React hooks, Python basics...)"}
-            />
-            {searchQuery && (
-              <button 
-                type="button" 
-                className="search-clear-btn" 
-                onClick={() => { setSearchQuery(''); setActiveTab('all'); fetchDefaultFeed(); }}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
+        <div className="search-sticky-wrapper">
+          <form onSubmit={handleSearch} className="search-container">
+            <div className="search-input-wrapper">
+              <input 
+                type="text" 
+                className="search-input"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={typingPlaceholder || "Search for tutorials (e.g., React hooks, Python basics...)"}
+              />
+              {searchQuery && (
+                <button 
+                  type="button" 
+                  className="search-clear-btn" 
+                  onClick={() => { setSearchQuery(''); setActiveTab('all'); fetchDefaultFeed(); }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              )}
+              <button type="submit" className="search-submit-btn" aria-label="Search">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
                 </svg>
               </button>
-            )}
-            <button type="submit" className="search-submit-btn" aria-label="Search">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-            </button>
-          </div>
-        </form>
+            </div>
+          </form>
 
-        {hasSearched && !loading && !hasEmptyResults && (
-          <div className="search-tabs">
-            <button className={`tab-btn ${activeTab === 'all' ? 'active' : ''}`} onClick={() => setActiveTab('all')}>All Results</button>
-            <button className={`tab-btn ${activeTab === 'videos' ? 'active' : ''}`} onClick={() => setActiveTab('videos')}>Videos ({results.videos.length})</button>
-            <button className={`tab-btn ${activeTab === 'docs' ? 'active' : ''}`} onClick={() => setActiveTab('docs')}>Documentation ({results.docs.length})</button>
-          </div>
-        )}
+          {hasSearched && !loading && !hasEmptyResults && (
+            <div className="search-tabs">
+              <button className={`tab-btn ${activeTab === 'all' ? 'active' : ''}`} onClick={() => setActiveTab('all')}>All Results</button>
+              <button className={`tab-btn ${activeTab === 'videos' ? 'active' : ''}`} onClick={() => setActiveTab('videos')}>Videos ({results.videos.length})</button>
+              <button className={`tab-btn ${activeTab === 'docs' ? 'active' : ''}`} onClick={() => setActiveTab('docs')}>Documentation ({results.docs.length})</button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="youtube-content">
@@ -162,9 +164,33 @@ const YoutubePage = () => {
              <p>Access an AI-curated ecosystem of top-tier tutorials and official documentation.</p>
            </div>
         ) : loading ? (
-          <div className="loading-state-wrapper">
-            <div className="simple-loader"></div>
-            <p className="searching-text">Searching across resources...</p>
+          <div className="search-results-layout">
+            <div className="resource-section">
+              <div className="section-header">
+                <h2 className="section-title">Videos</h2>
+              </div>
+              <div className="yt-skeleton-grid">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="yt-skeleton-card">
+                    <div className="yt-skeleton-thumb">
+                      <div className="yt-skeleton-duration"></div>
+                    </div>
+                    <div className="yt-skeleton-info">
+                      <div className="yt-skeleton-bar yt-sk-title"></div>
+                      <div className="yt-skeleton-bar yt-sk-title-short"></div>
+                      <div className="yt-skeleton-meta-row">
+                        <div className="yt-skeleton-bar yt-sk-channel"></div>
+                        <div className="yt-skeleton-bar yt-sk-views"></div>
+                      </div>
+                      <div className="yt-skeleton-actions">
+                        <div className="yt-skeleton-bar yt-sk-btn"></div>
+                        <div className="yt-skeleton-bar yt-sk-btn"></div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         ) : hasEmptyResults ? (
           <div className="empty-state">
