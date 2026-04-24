@@ -147,7 +147,7 @@
 
 .cr-lang-select:focus {
   outline: none;
-  border-color: var(--accent-gold);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .cr-lang-select option {

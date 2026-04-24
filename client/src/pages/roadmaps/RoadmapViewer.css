@@ -647,22 +647,60 @@
 }
 
 @media (max-width: 768px) {
+  .rv-page {
+    padding: 1rem;
+  }
+
   .rv-title {
     font-size: 1.4rem;
   }
-  
-  .rv-flowchart {
-    align-items: flex-start;
-    padding-left: 10px;
+
+  .rv-desc {
+    font-size: 0.85rem;
   }
-  
+
+  .rv-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .rv-header-right {
+    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .rv-progress-block {
+    text-align: left;
+  }
+
+  .rv-progress-bar {
+    width: 100%;
+  }
+
+  /* Flowchart area */
+  .rv-flowchart-area {
+    padding: 1.25rem;
+    border-radius: 16px;
+    min-height: auto;
+    overflow-x: auto;
+  }
+
+  .rv-flowchart {
+    width: 100%;
+    align-items: stretch;
+    padding-left: 0;
+  }
+
   .rv-flowchart > div {
     display: contents;
   }
-  
+
   .rv-flow-row {
     flex-direction: column !important;
-    align-items: flex-start !important;
+    align-items: stretch !important;
     gap: 0;
   }
 
@@ -670,15 +708,17 @@
     flex-direction: column !important;
   }
 
+  /* Nodes as horizontal row cards */
   .rv-node {
     width: 100%;
-    min-width: 250px;
+    min-width: 0;
     max-width: 100%;
     flex-direction: row;
     align-items: center;
     padding: 12px 16px;
     text-align: left;
     gap: 12px;
+    box-sizing: border-box;
   }
 
   .rv-node-check {
@@ -688,32 +728,52 @@
   }
 
   .rv-node-title {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     flex: 1;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
+    min-width: 0;
   }
 
   .rv-node-type {
     margin-left: auto;
+    flex-shrink: 0;
   }
 
+  /* Vertical connectors */
   .rv-h-connector {
     width: 2px !important;
-    height: 30px !important;
+    height: 24px !important;
     border-top: none !important;
-    border-left: 2px dashed rgba(255,192,0,0.4);
-    margin-left: 31px !important; /* aligns with center of 32px check + 16px pad */
+    border-left: 2px dashed rgba(255,192,0,0.35);
+    margin-left: 32px !important;
   }
 
   .rv-slant-connector {
     width: 2px !important;
-    height: 30px !important;
-    border-left: 2px dashed rgba(255,192,0,0.4);
-    margin-left: 31px !important; 
+    height: 24px !important;
+    border-left: 2px dashed rgba(255,192,0,0.35);
+    margin-left: 32px !important;
   }
-  
+
   .rv-slant-connector svg {
     display: none;
+  }
+
+  /* Detail panel */
+  .rv-detail-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .rv-detail-main {
+    padding: 1.25rem;
+  }
+
+  .rv-detail-title {
+    font-size: 1.15rem;
+  }
+
+  .rv-detail-video {
+    padding: 1.25rem;
   }
 }
 

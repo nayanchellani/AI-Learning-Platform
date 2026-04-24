@@ -584,7 +584,7 @@
 .form-group select:focus, 
 .form-group textarea:focus {
   outline: none;
-  border-color: var(--accent-gold);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .form-group select {
