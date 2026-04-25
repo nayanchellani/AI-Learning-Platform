@@ -35,7 +35,7 @@ router.get("/google/callback", passport.authenticate("google", {
     res.cookie("token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
     res.redirect(`${process.env.CLIENT_URL || "http://localhost:5173"}/dashboard`);
 });
